@@ -1,0 +1,40 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.av306.xenon.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+
+  ],
+  "client": [
+    "CameraAccessor",
+    "ChatHudMixin",
+    "ChatScreenMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayerInteractionManagerAccessor",
+    "ClientPlayerInteractionManagerMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "ClientWorldMixin",
+    "EntityRendererMixin",
+    "MobEntityRendererMixin",
+    "GameOptionsAccessor",
+    "GameRendererAccessor",
+    "GameRendererMixin",
+    "InGameHudMixin",
+    "InGameOverlayRendererMixin",
+    "KeyboardMixin",
+    "MinecraftClientAccessor",
+    "MinecraftClientMixin",
+    "MouseAccessor",
+    "MouseMixin",
+    "PlayerInventoryMixin",
+    "RenderSystemMixin",
+    "RenderTickCounterAccessor",
+    "RenderTickCounterMixin",
+    "SharedConstantsMixin",
+    "SimpleOptionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

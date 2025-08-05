@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "xenon",
+  "version": "${version}",
+
+  "name": "Xenon",
+  "description": "Some neat tools for Minecraft",
+  "authors": [ "Blender" ],
+  "contributors": [
+    "Janvier726",
+    "AustinJason"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/xenon",
+    "sources": "https://github.com/AV306/xenon",
+    "issues": "https://github.com/AV306/xenon/issues"
+  },
+
+  "license": "MIT License",
+  "icon": "assets/xenon/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [ "me.av306.xenon.MainInitializer" ],
+    "client": [ "me.av306.xenon.ClientInitializer" ],
+    "preLaunch": [ "me.av306.xenon.PreLaunchInitializer" ]
+  },
+  "mixins": [ "xenon.mixins.json" ],
+
+  "depends": {
+    "fabricloader": "*",
+    "fabric-key-binding-api-v1": "*",
+    "fabric": "*",
+    "minecraft": "1.21.6",
+    "java": ">=17"
+  },
+  "recommends": {
+    "completeconfig": "*",
+    "cloth-config": "*"
+  },
+  "suggests": {
+    "sodium": "*",
+    "iris": "*",
+    "carpet": "*",
+    "xaeros-minimap": "*"
+  },
+  "conflicts": {
+    "wurst-client": "*",
+    "wi-zoom": "*",
+    "zoomify": "*"
+  }
+}
