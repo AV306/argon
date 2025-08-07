@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -50,11 +50,6 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	// CompleteConfig
-	// why is there nothing in here
-	modImplementation "com.github.Lortseam.completeconfig:base:${project.complete_config_version}"
-	modImplementation "com.github.Lortseam.completeconfig:gui-cloth:${project.complete_config_version}"
-	//modImplementation "com.github.shedaniel:cloth-config:v10-SNAPSHOT"
 
 	implementation "org.slf4j:slf4j-api:${project.slf4j_version}"
 

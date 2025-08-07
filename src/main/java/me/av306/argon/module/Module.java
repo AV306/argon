@@ -1,18 +1,18 @@
-package me.av306.argon.feature;
+package me.av306.argon.module;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import me.av306.argon.Argon;
-import me.av306.argon.util.text.TextFactory;
+//import me.av306.argon.util.text.TextFactory;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
@@ -27,12 +27,12 @@ import java.util.Arrays;
  * but let's try this way first.
  * EDIT: this way works pretty nicely!
  */
-public abstract class IFeature
+public abstract class Module
 {
 	/**
 	 * The Feature's display name, i.e. the name to be displayed in FeatureList
 	 */
-	protected String name = "IFeature";
+	protected String name = "InvalidModule";
 	public String getName() { return this.name; }
 	public void setName( String name ) { this.name = name; }
 
@@ -40,7 +40,7 @@ public abstract class IFeature
  	 * The category for the feature in the keybinds page
    	 * Doesn't do anything outside the keybind registration yet.
    	 */
-	protected String category = "features";
+	protected String category = "modules";
 	public String getCategory() { return this.category; }
 
 	/**
@@ -80,7 +80,7 @@ public abstract class IFeature
 	 * @param aliases: Aliases for the feature in CP. <i>Technically can</i>, but should not, contain the name in the first argument
 	 * @see #IFeature(String, int, String...)
 	 */
-	protected IFeature( String name, String... aliases )
+	protected Module( String name, String... aliases )
 	{
 		this( name, GLFW.GLFW_KEY_UNKNOWN, aliases );
 	}
@@ -92,7 +92,7 @@ public abstract class IFeature
 	 * @param aliases: CommandProcessor aliases
 	 * @see #IFeature(String, int)
 	 */
-	protected IFeature( String name, int key, String... aliases )
+	protected Module( String name, int key, String... aliases )
 	{
 		this( name, key );
 
@@ -117,7 +117,7 @@ public abstract class IFeature
 	 * @param name: Display name
 	 * @see #IFeature(String, int)
 	 */
-	protected IFeature( String name )
+	protected Module( String name )
 	{
 		this( name, GLFW.GLFW_KEY_UNKNOWN );
 	}
@@ -128,7 +128,7 @@ public abstract class IFeature
 	 * @param name: Display name
 	 * @param key: GLFW keycode to bind to
 	 */
-	protected IFeature( String name, int key )
+	protected Module( String name, int key )
 	{
 		// Set fields
 		this.name = name;
@@ -215,13 +215,13 @@ public abstract class IFeature
 		if ( this.keyBinding.wasPressed() )
 			if ( this.forceDisabled )
 				// Server wishes to opt out of this feature
-				this.sendErrorMessage( "text.argon.ifeature.blocked", this.getName() );
+				this.sendErrorMessage( "text.argon.module.blocked", this.getName() );
 			else this.enable();
 	}
 
 	protected void toggleOrElseEnable()
 	{
-		if ( this instanceof IToggleableFeature itf ) itf.toggle();
+		if ( this instanceof ToggleableModule itf ) itf.toggle();
 		else this.enable();
 	}
 

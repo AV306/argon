@@ -1,6 +1,6 @@
 package me.av306.argon;
 
-import me.av306.argon.packets.OptInPacketPayload;
+//import me.av306.argon.packets.OptInPacketPayload;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -14,16 +14,16 @@ public class MainInitializer implements ModInitializer
 	public void onInitialize()
 	{
 		//if ( )
-		Argon.INSTANCE.LOGGER.info( "Doing logical server-side initialisation..." );
+		//Argon.INSTANCE.LOGGER.info( "Doing logical server-side initialisation..." );
 
 		// TODO
-		ServerPlayConnectionEvents.JOIN.register( (handler, sender, server) ->
+		/*ServerPlayConnectionEvents.JOIN.register( (handler, sender, server) ->
 		{
 			// Uncomment this line and replace the placeholder text
 			// with the name of the feature you wish to block.
 			// Timer and ProxRadar are blocked by default, and will be
 			// removed in a future version.
 			//sender.sendPacket( new OptOutPacketPayload( "[FEATURE_NAME_HERE]" ) );
-		} );
+		} );*/
 	}
 }

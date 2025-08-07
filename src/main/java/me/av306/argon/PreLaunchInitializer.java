@@ -8,9 +8,13 @@ public class PreLaunchInitializer implements PreLaunchEntrypoint
     @Override
     public void onPreLaunch()
     {
-        Argon.INSTANCE.LOGGER.info( "Beginning pre-launch initialisation!" );
+        //Argon.INSTANCE.LOGGER.info( "Beginning pre-launch initialisation!" );
         if ( initialized )
-            throw new RuntimeException( "Oh no! Xenon tried to perform pre-launch initialisation twice and this is very, very bad!!!" );
-        else Argon.INSTANCE.preLaunchInitialise();
+            throw new RuntimeException(
+                "Oh no! Argon pre-launch tried to initialise twice and this is very bad!!!" );
+        //else Argon.INSTANCE.preLaunchInitialise();
+        else Argon.INSTANCE.preLaunchInit();
+
+        this.initialized = true;
     }
 }

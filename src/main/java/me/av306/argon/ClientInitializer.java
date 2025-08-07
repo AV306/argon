@@ -9,11 +9,13 @@ public class ClientInitializer implements ClientModInitializer
     @Override
     public void onInitializeClient()
     {
-        Argon.INSTANCE.LOGGER.info( "Hello Fabric world!" );
+        //Argon.INSTANCE.LOGGER.info( "Hello Fabric world!" );
 
         if ( initialized )
-            throw new RuntimeException( "Oh no! Xenon tried to initialise twice and this is very bad!!!" );
-        else Argon.INSTANCE.initialise();
+            throw new RuntimeException(
+                    "Oh no! Argon tried to initialise twice and this is very bad!!!" );
+        //else Argon.INSTANCE.initialise();
+        else Argon.INSTANCE.clientInit();
 
         this.initialized = true;
     }

@@ -1,4 +1,4 @@
-package me.av306.argon.feature;
+package me.av306.argon.module;
 
 import me.av306.argon.Argon;
 import me.av306.argon.util.text.TextFactory;
@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public abstract class IToggleableFeature extends IFeature
+public abstract class ToggleableModule extends Module
 {
 	/**
  	* Text to display when the feature is enabled. Should not change after initialisation,
@@ -38,24 +38,24 @@ public abstract class IToggleableFeature extends IFeature
 
     //protected static IToggleableFeature instance;
 
-	protected IToggleableFeature( String name )
+	protected ToggleableModule( String name )
     {
         this( name, GLFW.GLFW_KEY_UNKNOWN );
     }
 
-    protected IToggleableFeature( String name, String... aliases )
+    protected ToggleableModule( String name, String... aliases )
     {
         this( name, GLFW.GLFW_KEY_UNKNOWN, aliases );
     }
 
-    protected IToggleableFeature( String name, int key )
+    protected ToggleableModule( String name, int key )
     {
         super( name, key );
 		
 		this.enabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.enabled", name )
-                .formatted(Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
         this.disabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.disabled", name )
-                .formatted(Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
 
         this.commandBuilder.then( literal( "disable" ).executes( context -> { this.disable(); return 1; } ) );
         this.commandBuilder.then( literal( "d" ).executes( context -> { this.disable(); return 1; } ) );
@@ -66,16 +66,17 @@ public abstract class IToggleableFeature extends IFeature
         );
     }
 
-    protected IToggleableFeature( String name, int key, String... aliases )
+    protected ToggleableModule( String name, int key, String... aliases )
     {
         super( name, key, aliases );
 
 		this.enabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.enabled", name )
-                .formatted(Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
         this.disabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.disabled", name )
-                .formatted(Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
 
         // We're registering the things like thrice, but it works, so I'm not complaining
+        // FIXME: the time has come. I must complain
         this.commandBuilder.then( literal( "disable" ).executes( context -> { this.disable(); return 1; } ) );
         this.commandBuilder.then( literal( "d" ).executes( context -> { this.disable(); return 1; } ) );
         this.commandBuilder.then( literal( "toggle" ).executes( context -> { this.toggle(); return 1; } ) );
