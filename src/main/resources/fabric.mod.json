@@ -1,31 +1,29 @@
 {
   "schemaVersion": 1,
-  "id": "xenon",
+  "id": "argon",
   "version": "${version}",
 
-  "name": "Xenon",
-  "description": "Some neat tools for Minecraft",
+  "name": "Argon",
+  "description": "Some other neat tools for Minecraft",
   "authors": [ "Blender" ],
   "contributors": [
-    "Janvier726",
-    "AustinJason"
   ],
   "contact": {
-    "homepage": "https://modrinth.com/mod/xenon",
-    "sources": "https://github.com/AV306/xenon",
-    "issues": "https://github.com/AV306/xenon/issues"
+    "homepage": "",
+    "sources": "https://github.com/AV306/argon",
+    "issues": "https://github.com/AV306/argon-util/issues"
   },
 
   "license": "MIT License",
-  "icon": "assets/xenon/icon.png",
+  "icon": "assets/argon/icon.png",
 
   "environment": "client",
   "entrypoints": {
-    "main": [ "me.av306.xenon.MainInitializer" ],
-    "client": [ "me.av306.xenon.ClientInitializer" ],
-    "preLaunch": [ "me.av306.xenon.PreLaunchInitializer" ]
+    "main": [ "me.av306.argon.MainInitializer" ],
+    "client": [ "me.av306.argon.ClientInitializer" ],
+    "preLaunch": [ "me.av306.argon.PreLaunchInitializer" ]
   },
-  "mixins": [ "xenon.mixins.json" ],
+  "mixins": [ "argon.mixins.json" ],
 
   "depends": {
     "fabricloader": "*",
@@ -35,8 +33,6 @@
     "java": ">=17"
   },
   "recommends": {
-    "completeconfig": "*",
-    "cloth-config": "*"
   },
   "suggests": {
     "sodium": "*",
@@ -45,8 +41,5 @@
     "xaeros-minimap": "*"
   },
   "conflicts": {
-    "wurst-client": "*",
-    "wi-zoom": "*",
-    "zoomify": "*"
   }
 }
