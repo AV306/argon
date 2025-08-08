@@ -116,7 +116,7 @@ public abstract class ToggleableModule extends Module
 
         Argon.INSTANCE.LOGGER.info( "{} enabled!", this.getName() );
 
-        Argon.INSTANCE.enabledFeatures.add( this );
+        Argon.INSTANCE.enabledModules.add( this );
 
         try
         {
@@ -135,7 +135,7 @@ public abstract class ToggleableModule extends Module
 
         Argon.INSTANCE.LOGGER.info( this.getName() + " disabled!" );
 
-        Argon.INSTANCE.enabledFeatures.remove( this );
+        Argon.INSTANCE.enabledModules.remove( this );
 
         try
         {

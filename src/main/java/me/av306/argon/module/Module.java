@@ -1,16 +1,17 @@
 package me.av306.argon.module;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import me.av306.argon.Argon;
-//import me.av306.argon.util.text.TextFactory;
+import me.av306.argon.util.text.TextFactory;
+
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import net.minecraft.client.option.KeyBinding;
@@ -99,7 +100,7 @@ public abstract class Module
 		// register aliases
 		for ( String alias : aliases )
 		{
-			Argon.INSTANCE.featureRegistry.put( alias.toLowerCase(), this );
+			Argon.INSTANCE.moduleRegistry.put( alias.toLowerCase(), this );
 
 			// Register aliases as Brigadier command redirects
 			ClientCommandRegistrationCallback.EVENT.register( (dispatcher, registryAccess) ->
@@ -149,7 +150,7 @@ public abstract class Module
 
 		// Register display name in CP registry
 		String formattedName = name.replaceAll( " ", "" ).toLowerCase();
-		Argon.INSTANCE.featureRegistry.put( formattedName, this );
+		Argon.INSTANCE.moduleRegistry.put( formattedName, this );
 
 		// Register a Brigadier command (native minecraft client command)
 		// FIXME: this causes issues with commands accepting more than one string argument
@@ -287,7 +288,7 @@ public abstract class Module
 					config,
 					value
 			);
-			Argon.INSTANCE.config.save();
+			//Argon.INSTANCE.config.save();
 		}
 		else
 		{
@@ -360,7 +361,7 @@ public abstract class Module
 
 		try
 		{
-			Argon.INSTANCE.client.player.sendMessage( message );
+			Argon.INSTANCE.client.player.sendMessage( message, false );
 		}
 		catch ( NullPointerException ignored ) {}
 	}
@@ -377,7 +378,7 @@ public abstract class Module
 
 		try
 		{
-			Argon.INSTANCE.client.player.sendMessage( message );
+			Argon.INSTANCE.client.player.sendMessage( message, false );
 		}
 		catch ( NullPointerException ignored ) {}
 	}
@@ -392,7 +393,7 @@ public abstract class Module
 
 		try
 		{
-			Argon.INSTANCE.client.player.sendMessage( message );
+			Argon.INSTANCE.client.player.sendMessage( message, false );
 		}
 		catch ( NullPointerException ignored ) {}
 	}
