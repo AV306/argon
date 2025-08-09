@@ -28,12 +28,12 @@ import java.util.Arrays;
  * but let's try this way first.
  * EDIT: this way works pretty nicely!
  */
-public abstract class Module
+public abstract class AbstractModule
 {
 	/**
 	 * The Feature's display name, i.e. the name to be displayed in FeatureList
 	 */
-	protected String name = "InvalidModule";
+	protected String name;
 	public String getName() { return this.name; }
 	public void setName( String name ) { this.name = name; }
 
@@ -79,9 +79,9 @@ public abstract class Module
 	 * Constructor that initialises a feature with the given display name, aliases and no default key
 	 * @param name: The Feature's display name
 	 * @param aliases: Aliases for the feature in CP. <i>Technically can</i>, but should not, contain the name in the first argument
-	 * @see #IFeature(String, int, String...)
+	 * @see #Module(String, int, String...)
 	 */
-	protected Module( String name, String... aliases )
+	protected AbstractModule( String name, String... aliases )
 	{
 		this( name, GLFW.GLFW_KEY_UNKNOWN, aliases );
 	}
@@ -91,19 +91,20 @@ public abstract class Module
 	 * @param name: Display name
 	 * @param key: GLFW keycode to bind to
 	 * @param aliases: CommandProcessor aliases
-	 * @see #IFeature(String, int)
+	 * @see #AbstractModule(String, int)
 	 */
-	protected Module( String name, int key, String... aliases )
+	protected AbstractModule( String name, int key, String... aliases )
 	{
 		this( name, key );
 
-		// register aliases
+		// Register aliases in module registry
 		for ( String alias : aliases )
 		{
 			Argon.INSTANCE.moduleRegistry.put( alias.toLowerCase(), this );
 
 			// Register aliases as Brigadier command redirects
-			ClientCommandRegistrationCallback.EVENT.register( (dispatcher, registryAccess) ->
+			ClientCommandRegistrationCallback.EVENT.register(
+                    (dispatcher, registryAccess) ->
 					dispatcher.register(
 							ClientCommandManager.literal( alias )
 									.executes( context -> { this.toggleOrElseEnable(); return 1; } )
@@ -116,9 +117,9 @@ public abstract class Module
 	/**
 	 * Constructor that initialises a feature with a display name, no aliases and no default key
 	 * @param name: Display name
-	 * @see #IFeature(String, int)
+	 * @see #AbstractModule(String, int)
 	 */
-	protected Module( String name )
+	protected AbstractModule( String name )
 	{
 		this( name, GLFW.GLFW_KEY_UNKNOWN );
 	}
@@ -129,7 +130,7 @@ public abstract class Module
 	 * @param name: Display name
 	 * @param key: GLFW keycode to bind to
 	 */
-	protected Module( String name, int key )
+	protected AbstractModule( String name, int key )
 	{
 		// Set fields
 		this.name = name;
@@ -213,16 +214,18 @@ public abstract class Module
 	 */
 	protected void keyEvent()
 	{
-		if ( this.keyBinding.wasPressed() )
-			if ( this.forceDisabled )
-				// Server wishes to opt out of this feature
-				this.sendErrorMessage( "text.argon.module.blocked", this.getName() );
-			else this.enable();
+		while ( this.keyBinding.wasPressed() )
+        {
+            if ( this.forceDisabled )
+                // Server wishes to opt out of this feature
+                this.sendErrorMessage( "text.argon.module.blocked", this.getName() );
+            else this.enable();
+        }
 	}
 
 	protected void toggleOrElseEnable()
 	{
-		if ( this instanceof ToggleableModule itf ) itf.toggle();
+		if ( this instanceof AbstractToggleableModule itf ) itf.toggle();
 		else this.enable();
 	}
 

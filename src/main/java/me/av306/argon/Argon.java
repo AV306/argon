@@ -3,11 +3,14 @@ package me.av306.argon;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import me.av306.argon.modules.render.ProximityRadar;
+import me.av306.argon.util.KeybindUtil;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.av306.argon.module.Module;
-import me.av306.argon.module.ToggleableModule;
+import me.av306.argon.module.AbstractModule;
+import me.av306.argon.module.AbstractToggleableModule;
 import me.av306.argon.util.text.TextFactory;
 
 import net.minecraft.client.MinecraftClient;
@@ -15,11 +18,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
@@ -51,8 +50,8 @@ public enum Argon
     // This is most likely going to be used to resolve a feature
     // by its name (e.g. CommandProcessor),
     // so I put it in this order.
-    public final HashMap<String, Module> moduleRegistry = new HashMap<>();
-    public final ArrayList<ToggleableModule> enabledModules = new ArrayList<>();
+    public final HashMap<String, AbstractModule> moduleRegistry = new HashMap<>();
+    public final ArrayList<AbstractToggleableModule> enabledModules = new ArrayList<>();
 
     //public HashMap<String, Command> commandRegistry = new HashMap<>();
 
@@ -66,7 +65,17 @@ public enum Argon
 
     public void clientInit()
     {
-        System.out.println( "Hello from Argon client init!" );
+        LOGGER.info( "Hello from Argon client init!" );
+
+        this.client = MinecraftClient.getInstance();
+
+        this.modifierKey = KeybindUtil.registerKeybind(
+                "modifier",
+                GLFW.GLFW_KEY_UNKNOWN,
+                "modules"
+        );
+
+        new ProximityRadar();
     }
 
     private final Text namePrefix = TextFactory.createLiteral( "[Xenon] " )
@@ -79,12 +88,12 @@ public enum Argon
         // FIXME: This feels very inefficient
         Argon.INSTANCE.LOGGER.info( "Exiting world, disabling all features" );
 
-        ArrayList<ToggleableModule> enabledModules_copy = new ArrayList<>( this.enabledModules );
-        for ( ToggleableModule module : enabledModules_copy )
+        ArrayList<AbstractToggleableModule> enabledModules_copy = new ArrayList<>( this.enabledModules );
+        for ( AbstractToggleableModule module : enabledModules_copy )
             if ( !module.isPersistent() ) module.disable();
 
         // Remove restrictions
-        for ( Module module : this.moduleRegistry.values() )
+        for ( AbstractModule module : this.moduleRegistry.values() )
             module .setForceDisabled( false );
     }
 

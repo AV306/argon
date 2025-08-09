@@ -2,7 +2,6 @@ package me.av306.argon.module;
 
 import me.av306.argon.Argon;
 import me.av306.argon.util.text.TextFactory;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.text.Text;
 
@@ -10,7 +9,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public abstract class ToggleableModule extends Module
+public abstract class AbstractToggleableModule extends AbstractModule
 {
 	/**
  	* Text to display when the feature is enabled. Should not change after initialisation,
@@ -38,24 +37,24 @@ public abstract class ToggleableModule extends Module
 
     //protected static IToggleableFeature instance;
 
-	protected ToggleableModule( String name )
+	protected AbstractToggleableModule( String name )
     {
         this( name, GLFW.GLFW_KEY_UNKNOWN );
     }
 
-    protected ToggleableModule( String name, String... aliases )
+    protected AbstractToggleableModule( String name, String... aliases )
     {
         this( name, GLFW.GLFW_KEY_UNKNOWN, aliases );
     }
 
-    protected ToggleableModule( String name, int key )
+    protected AbstractToggleableModule( String name, int key )
     {
         super( name, key );
 		
 		this.enabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.enabled", name )
                 .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
         this.disabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.disabled", name )
-                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.INSTANCE.ERROR_FORMAT );
 
         this.commandBuilder.then( literal( "disable" ).executes( context -> { this.disable(); return 1; } ) );
         this.commandBuilder.then( literal( "d" ).executes( context -> { this.disable(); return 1; } ) );
@@ -66,7 +65,7 @@ public abstract class ToggleableModule extends Module
         );
     }
 
-    protected ToggleableModule( String name, int key, String... aliases )
+    protected AbstractToggleableModule( String name, int key, String... aliases )
     {
         super( name, key, aliases );
 
@@ -98,10 +97,13 @@ public abstract class ToggleableModule extends Module
     @Override
     protected void keyEvent()
     {
-        if ( this.keyBinding.wasPressed() && !Argon.INSTANCE.modifierKey.isPressed() )
+        while ( this.keyBinding.wasPressed() && !Argon.INSTANCE.modifierKey.isPressed() )
         {
             if ( this.forceDisabled )
+            {
+                Argon.INSTANCE.LOGGER.warn( "Force-disabled feature enabled: {}", this.name );
                 Argon.INSTANCE.sendErrorMessage( "text.argon.ifeature.blocked", this.name );
+            }
         
             else this.toggle();
         }
@@ -115,7 +117,6 @@ public abstract class ToggleableModule extends Module
         this.isEnabled = true;
 
         Argon.INSTANCE.LOGGER.info( "{} enabled!", this.getName() );
-
         Argon.INSTANCE.enabledModules.add( this );
 
         try
