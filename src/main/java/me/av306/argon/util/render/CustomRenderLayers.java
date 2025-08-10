@@ -9,11 +9,13 @@ import java.util.OptionalDouble;
 
 public class CustomRenderLayers
 {
-    // TODO: define custon no-Z=test render pipeline
+    /**
+     * Render layer for lines, main target, position/colour
+     */
     public static final RenderLayer.MultiPhase OVERLAY_LINES = RenderLayer.MultiPhase.of(
             "argon:overlay_lines",
             1536,
-            RenderPipelines.DEBUG_LINE_STRIP, // TODO: replace with above custom pipeline
+            CustomRenderPipelines.OVERLAY_LINES,
             RenderLayer.MultiPhaseParameters.builder()
                     .lineWidth( new RenderPhase.LineWidth( OptionalDouble.of( 2 ) ) )
                     .layering( RenderPhase.VIEW_OFFSET_Z_LAYERING )
