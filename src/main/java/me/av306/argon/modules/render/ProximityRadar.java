@@ -5,6 +5,8 @@ import me.av306.argon.module.AbstractToggleableModule;
 import me.av306.argon.util.text.TextFactory;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderLayerHelper;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -54,7 +56,9 @@ public class ProximityRadar extends AbstractToggleableModule
 
     private ActionResult scanEntities( WorldRenderContext context )
     {
-        // FIXME: figure out how to optimise this
+        RenderLayer.MultiPhase renderLayer =
+
+
 
         // Only run the scan if the feature is enabled and essential stuff isn't null
         if (
