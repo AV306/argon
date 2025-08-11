@@ -9,71 +9,93 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.Iterator;
+
 /**
  * Helper class for text-related operations.
- *
+ * <p>
  * Contains methods for drawing text at a predefined position,
  * as well as appending lines to text.
- *
+ * <p>
  * TODO: implement BOTTOM_* text drawing
  */
 public class TextUtil
 {
+    public static int MARGIN = 5;
+    public static int LINE_SPACING = 2;
+    /*public static void drawTestText( DrawContext drawContext )
+    {
+        TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
+        int scaledWidth = Argon.getInstance().client.getWindow().getScaledWidth();
+        int scaledHeight = Argon.getInstance().client.getWindow().getScaledHeight();
+
+        // 0, 0
+        drawContext.drawText( textRenderer, "(0, 0)", 0, 0, 0xFFFFFFFF, false );
+
+        // W, 0
+        //drawContext.drawText( textRenderer, "(" + scaledWidth + ", 0)", scaledWidth, 0, 0xFFFFFFFF, false );
+    }*/
+
+    // TODO: do we want to split the position up into top/centre/bottom, left/centre/right?
 	public static void drawPositionedText(
-			DrawContext context,
-			Text text,
+            DrawContext context,
+            Text text,
 			ScreenPosition position,
-			int xOffset,
-			int yOffset,
-			boolean shadow,
+            int xOffset, int yOffset,
+            boolean shadow,
 			int color
-	)
+    )
 	{
-		TextRenderer textRenderer = Argon.INSTANCE.client.textRenderer;
+		TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
 
-		int scaledWidth = Argon.INSTANCE.client.getWindow().getScaledWidth();
-		int scaledHeight = Argon.INSTANCE.client.getWindow().getScaledHeight();
+		int scaledWidth = Argon.getInstance().client.getWindow().getScaledWidth();
+		int scaledHeight = Argon.getInstance().client.getWindow().getScaledHeight();
 
-		// Default values for x and y
-		int x = 5 + xOffset, y = 5 + yOffset;
+		int x = MARGIN + xOffset, y = MARGIN + yOffset;
 
-		// the cases are designed to fall through to each other
-		// to minimise repeated code.
+        // Text is anchored at its top left corner
+
 		switch ( position )
-		{
-			case BOTTOM_LEFT:
-				// calculate y
-				y = scaledHeight - 10;
-			case TOP_LEFT:
-				// ok, skip
-				break;
+        {
+            case TOP_LEFT:
+                context.drawText( textRenderer, text, x, y, color, shadow );
+                break;
 
-			case BOTTOM_CENTER:
-				// calculate y
-				y = scaledHeight - 10 - yOffset;
-			case TOP_CENTER:
-				// calculate x (ignore offset)
-				x = (scaledWidth - textRenderer.getWidth( text )) / 2;
-				break;
+            case TOP_RIGHT:
+                x = scaledWidth - textRenderer.getWidth( text ) - MARGIN - xOffset;
+                context.drawText( textRenderer, text, x, y, color, shadow );
+                break;
 
-			case BOTTOM_RIGHT:
-				// calculate y
-				y = scaledHeight - 10 - yOffset;
-			case TOP_RIGHT:
-				// calculate x
-			  	x = scaledWidth - textRenderer.getWidth( text ) - 5 - xOffset;
-				break;
+            case BOTTOM_LEFT:
+                y = scaledHeight - textRenderer.fontHeight - MARGIN - yOffset;
+                context.drawText( textRenderer, text, x, y, color, shadow );
+                break;
+
+            case BOTTOM_RIGHT:
+                x = scaledWidth - textRenderer.getWidth( text ) - MARGIN - xOffset;
+                y = scaledHeight - textRenderer.fontHeight - MARGIN - yOffset;
+                context.drawText( textRenderer, text, x, y, color, shadow );
+                break;
+
+
+            case BOTTOM_CENTER:
+                x = (scaledWidth - textRenderer.getWidth( text )) / 2;
+                y = scaledHeight - textRenderer.fontHeight - MARGIN - yOffset;
+                context.drawText( textRenderer, text, x, y, color, shadow );
+                break;
+
+            case TOP_CENTER:
+                x = (scaledWidth - textRenderer.getWidth( text )) / 2;
+                context.drawText( textRenderer, text, x, y, color, shadow );
+                break;
 		}
-
-		context.drawText( textRenderer, text, x, y, color, shadow );
 	}
 
 	public static void drawPositionedText(
 			DrawContext context,
 			Text text,
 			ScreenPosition position,
-			int xOffset,
-			int yOffset,
+			int xOffset, int yOffset,
 			boolean shadow,
 			Formatting formatting
 	)
@@ -89,14 +111,7 @@ public class TextUtil
 			color = ColorUtil.WHITE;
 		}
 
-		TextUtil.drawPositionedText(
-				context,
-				text,
-				position,
-				xOffset, yOffset,
-				shadow,
-				color
-		);
+		TextUtil.drawPositionedText( context, text, position, xOffset, yOffset, shadow, color );
 	}
 
 	public static void drawPositionedMultiLineText(
@@ -113,75 +128,71 @@ public class TextUtil
 		// X is LEFT-RIGHT offset
 		// I'm dumb
 
-		TextRenderer textRenderer = Argon.INSTANCE.client.textRenderer;
-		int scaledWidth = Argon.INSTANCE.client.getWindow().getScaledWidth();
-		int scaledHeight = Argon.INSTANCE.client.getWindow().getScaledHeight();
+		TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
 
-		int x = 5 + xOffset, y = 5 + yOffset;
-		switch ( position )
-		{
-			case TOP_LEFT:
-				for ( Text text : texts )
-				{
-					context.drawText( textRenderer, text, x, y, color, shadow );
-          			y += 12;
-			  	}
-				break;
-				
-			case TOP_CENTER:
-		    	for ( Text text : texts )
-        		{
-					x = (scaledWidth - textRenderer.getWidth( text )) / 2;
+		int scaledWidth = Argon.getInstance().client.getWindow().getScaledWidth();
+		int scaledHeight = Argon.getInstance().client.getWindow().getScaledHeight();
 
-			        context.drawText( textRenderer, text, x, y, color, shadow );
+		int x = MARGIN + xOffset, y = MARGIN + yOffset;
 
-					y += 12;
-        		}
-		    	break;
-				
-			case TOP_RIGHT:
-				for ( Text text : texts )
-        		{
-					x = scaledWidth - textRenderer.getWidth( text ) - 5 - xOffset;
+        switch ( position )
+        {
+            case TOP_LEFT:
+                for ( Text text : texts )
+                {
+                    context.drawText( textRenderer, text, x, y, color, shadow );
+                    y += textRenderer.fontHeight + LINE_SPACING;
+                }
+                break;
 
-			        context.drawText( textRenderer, text, x, y, color, shadow );
+            case TOP_RIGHT:
+                for ( Text text : texts )
+                {
+                    x = scaledWidth - textRenderer.getWidth( text ) - MARGIN - xOffset;
+                    context.drawText( textRenderer, text, x, y, color, shadow );
+                    y += textRenderer.fontHeight + LINE_SPACING;
+                }
+                break;
 
-					y += 12;
-			  	}
-				break;
+            case BOTTOM_LEFT:
+                y = scaledHeight - textRenderer.fontHeight - MARGIN - yOffset;
+                for ( Text text : texts )
+                {
+                    context.drawText( textRenderer, text, x, y, color, shadow );
+                    y -= textRenderer.fontHeight + LINE_SPACING;
+                }
+                break;
 
-			case BOTTOM_LEFT:
-				y = scaledHeight - 10 - yOffset;
-				for ( Text text : texts )
-				{
-					context.drawText( textRenderer, text, x, y, color, shadow );
+            case BOTTOM_RIGHT:
+                y = scaledHeight - textRenderer.fontHeight - MARGIN - yOffset;
+                for ( Text text : texts )
+                {
+                    x = scaledWidth - textRenderer.getWidth( text ) - MARGIN - xOffset;
+                    context.drawText( textRenderer, text, x, y, color, shadow );
+                    y -= textRenderer.fontHeight + LINE_SPACING;
+                }
+                break;
 
-					y -= 12;
-				}
-				break;
 
-			case BOTTOM_CENTER:
-				y = scaledHeight - 5 - yOffset;
-				for ( Text text : texts )
-				{
-					x = (scaledWidth - textRenderer.getWidth( text )) / 2;
+            case BOTTOM_CENTER:
+                y = scaledHeight - textRenderer.fontHeight - MARGIN - yOffset;
+                for ( Text text : texts )
+                {
+                    x = (scaledWidth - textRenderer.getWidth( text )) / 2;
+                    context.drawText( textRenderer, text, x, y, color, shadow );
+                    y -= textRenderer.fontHeight + LINE_SPACING;
+                }
+                break;
 
-					context.drawText( textRenderer, text, x, y, color, shadow );
-
-					y -= 12;
-				}
-			case BOTTOM_RIGHT:
-				y = scaledHeight - 5 - yOffset;
-				for ( Text text : texts )
-				{
-					x = scaledWidth - textRenderer.getWidth( text ) - 5 - xOffset;
-
-					context.drawText( textRenderer, text, x, y, color, shadow );
-
-					y -= 12;
-				}
-				break;
-		}
+            case TOP_CENTER:
+                for ( Text text : texts )
+                {
+                    x = (scaledWidth - textRenderer.getWidth( text )) / 2;
+                    context.drawText( textRenderer, text, x, y, color, shadow );
+                    y += textRenderer.fontHeight + LINE_SPACING;
+                }
+                break;
+        }
 	}
 
 	public static void drawPositionedMultiLineText(
@@ -214,5 +225,72 @@ public class TextUtil
 		);
 	}
 
+    public static void drawPositionedTexts(
+        DrawContext drawContext,
+        Iterator<String> texts,
+        ScreenPosition position,
+        int xOffset, int yOffset,
+        boolean shadow,
+        Formatting formatting
+    )
+    {
+        TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
+        int x = switch ( position )
+        {
+            case TOP_LEFT, BOTTOM_LEFT -> (MARGIN + xOffset);
+            case TOP_RIGHT, BOTTOM_RIGHT -> (Argon.getInstance().client.getWindow().getScaledWidth() - MARGIN - xOffset);
+            default -> 0;
+        };
 
+        int y = switch ( position )
+        {
+            case TOP_LEFT, TOP_RIGHT -> (MARGIN + yOffset);
+            case BOTTOM_LEFT, BOTTOM_RIGHT -> (Argon.getInstance().client.getWindow().getScaledHeight() - MARGIN - yOffset);
+            default -> 0;
+        };
+                
+        while ( texts.hasNext() )
+        {
+            switch ( position )
+            {
+                case TOP_LEFT ->
+                {
+                    drawContext.drawText( textRenderer, texts.next(), x, y,
+                            formatting.getColorValue(), shadow );
+                    
+                    y += textRenderer.fontHeight + LINE_SPACING;
+                }
+
+                case TOP_RIGHT ->
+                {
+                    String text = texts.next();
+                    int startX = x - textRenderer.getWidth( text );
+                    drawContext.drawText( textRenderer, texts.next(), startX, y,
+                            formatting.getColorValue(), shadow );
+                    y += textRenderer.fontHeight + LINE_SPACING;
+                    
+                }
+
+                case BOTTOM_LEFT ->
+                {
+                    drawContext.drawText( textRenderer, texts.next(), x, y,
+                            formatting.getColorValue(), shadow );
+                    
+                    y -= textRenderer.fontHeight + LINE_SPACING;
+                }
+
+                case BOTTOM_RIGHT ->
+                {
+                    String text = texts.next();
+                    int startX = x - textRenderer.getWidth( text );
+                    drawContext.drawText( textRenderer, texts.next(), startX, y,
+                            formatting.getColorValue(), shadow );
+                    y -= textRenderer.fontHeight + LINE_SPACING;
+                    
+                }
+
+                default -> Argon.LOGGER.error( "TextUtil.drawPositionedTexts() called with position " + position.toString() + " that is not implemented yet!" );
+            }
+        }
+    }
 }

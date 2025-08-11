@@ -3,8 +3,13 @@ package me.av306.argon;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import me.av306.argon.modules.ModuleList;
+import me.av306.argon.modules.movement.Timer;
 import me.av306.argon.modules.render.ProximityRadar;
 import me.av306.argon.util.KeybindUtil;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,30 +31,30 @@ import net.fabricmc.loader.api.Version;
 //#endregion
 
 // FIXME: not sure about the suitability of the enum singleton pattern
-public enum Argon
+public class Argon implements ClientModInitializer, PreLaunchEntrypoint
 {
-    INSTANCE;
+    private static final Argon INSTANCE = new Argon();
 
-    public final String MODID = "argon";
-	
-    public final boolean debug = true;
-	
-    public final Logger LOGGER = LoggerFactory.getLogger( this.MODID );
+    public static Argon getInstance()
+    {
+        return INSTANCE;
+    }
 
-    public MinecraftClient client;
+    public static final String MOD_ID = "argon";
+    public static final boolean debug = true;
 
+    public static final Logger LOGGER = LoggerFactory.getLogger( MOD_ID );
     public KeyBinding modifierKey;
 
+    public MinecraftClient client;
     //public MinecraftClientAccessor clientAccessor;
 
-    public final Formatting SUCCESS_FORMAT = Formatting.GREEN;
-    public final Formatting MESSAGE_FORMAT = Formatting.AQUA;
-    public final Formatting WARNING_FORMAT = Formatting.YELLOW;
-    public final Formatting ERROR_FORMAT = Formatting.RED;
+    public static final Formatting SUCCESS_FORMAT = Formatting.GREEN;
+    public static final Formatting MESSAGE_FORMAT = Formatting.AQUA;
+    public static final Formatting WARNING_FORMAT = Formatting.YELLOW;
+    public static final Formatting ERROR_FORMAT = Formatting.RED;
 
-    // This is most likely going to be used to resolve a feature
-    // by its name (e.g. CommandProcessor),
-    // so I put it in this order.
+
     public final HashMap<String, AbstractModule> moduleRegistry = new HashMap<>();
     public final ArrayList<AbstractToggleableModule> enabledModules = new ArrayList<>();
 
@@ -58,14 +63,35 @@ public enum Argon
     public ModContainer modContainer;
     public String versionString;
 
-    public void preLaunchInit()
+    // The instance that the init methods are called on isn't guaranteed to be
+    // the same, which is super annoying because I have instance stuff going on
+    // I want to try something other than the enum singleton method, though
+    // The init methods just call the singleton's methods
+
+    @Override
+    public void onPreLaunch()
     {
-        System.out.println( "Hello from Argon prelaunch init!" );
+        INSTANCE.initPrelaunch();
     }
 
-    public void clientInit()
+    @Override
+    public void onInitializeClient()
+    {
+
+        // Call the singleton's init method
+        INSTANCE.initClient();
+    }
+
+    private void initPrelaunch()
+    {
+        LOGGER.info( "Hello from Argon prelaunch init!" );
+    }
+
+    private void initClient()
     {
         LOGGER.info( "Hello from Argon client init!" );
+
+        this.readVersionData();
 
         this.client = MinecraftClient.getInstance();
 
@@ -75,18 +101,20 @@ public enum Argon
                 "modules"
         );
 
+        new ModuleList();
         new ProximityRadar();
+        new Timer();
     }
 
-    private final Text namePrefix = TextFactory.createLiteral( "[Xenon] " )
-            .formatted( this.MESSAGE_FORMAT );
+    private static final Text NAME_PREFIX = TextFactory.createLiteral( "[Argon] " )
+            .formatted( MESSAGE_FORMAT );
 
-    public MutableText getNamePrefixCopy() { return namePrefix.copy(); }
+    public static MutableText getNamePrefixCopy() { return NAME_PREFIX.copy(); }
 
     public void disableAllFeatures()
     {
         // FIXME: This feels very inefficient
-        Argon.INSTANCE.LOGGER.info( "Exiting world, disabling all features" );
+        Argon.getInstance().LOGGER.info( "Exiting world, disabling all features" );
 
         ArrayList<AbstractToggleableModule> enabledModules_copy = new ArrayList<>( this.enabledModules );
         for ( AbstractToggleableModule module : enabledModules_copy )
@@ -94,7 +122,7 @@ public enum Argon
 
         // Remove restrictions
         for ( AbstractModule module : this.moduleRegistry.values() )
-            module .setForceDisabled( false );
+            module.setForceDisabled( false );
     }
 
 
@@ -102,17 +130,27 @@ public enum Argon
     private void readVersionData()
     {
         //assert FabricLoader.getInstance().getModContainer( "xenon" ).isPresent();
-        this.modContainer = FabricLoader.getInstance().getModContainer( "xenon" ).get();
+        this.modContainer = FabricLoader.getInstance().getModContainer( MOD_ID ).get();
         // Get version string
         Version ver = modContainer.getMetadata().getVersion();
         this.versionString = ver.getFriendlyString();
+    }
+
+    public String getVersionString()
+    {
+        return this.versionString;
+    }
+
+    public Identifier argonIdentifier( String path )
+    {
+        return Identifier.of( MOD_ID, path );
     }
 
 
     
     public void sendInfoMessage( String key )
     {
-        Text finalText = namePrefix.copy()
+        Text finalText = NAME_PREFIX.copy()
                 .append( TextFactory.createTranslatable( key ) );
         try
         {
@@ -123,7 +161,7 @@ public enum Argon
 
     public void sendInfoMessage( String key, Object... args )
     {
-        Text finalText = namePrefix.copy()
+        Text finalText = NAME_PREFIX.copy()
                 .append( TextFactory.createTranslatable( key, args ) );
         try
         {
@@ -134,7 +172,7 @@ public enum Argon
 
     /*public void sendInfoMessage( Text text )
     {
-        Text finalText = namePrefix.copy()
+        Text finalText = NAME_PREFIX.copy()
                 .append( text );
         try
         {
@@ -145,8 +183,8 @@ public enum Argon
 
     public void sendWarningMessage( String key )
     {
-        Text finalText = namePrefix.copy().append(
-                TextFactory.createTranslatable( key ).formatted( this.MESSAGE_FORMAT ) );
+        Text finalText = NAME_PREFIX.copy().append(
+                TextFactory.createTranslatable( key ).formatted( WARNING_FORMAT ) );
         try
         {
             this.client.player.sendMessage( finalText, false );
@@ -156,9 +194,9 @@ public enum Argon
 
     public void sendWarningMessage( String key, Object... args )
     {
-        Text finalText = namePrefix.copy().append(
+        Text finalText = NAME_PREFIX.copy().append(
                 TextFactory.createTranslatable( key, args )
-                .formatted( this.WARNING_FORMAT ) );
+                .formatted( WARNING_FORMAT ) );
         try
         {
             this.client.player.sendMessage( finalText, false );
@@ -168,7 +206,7 @@ public enum Argon
 
     /*public void sendWarningMessage( Text text )
     {
-        Text finalText = namePrefix.copy()
+        Text finalText = NAME_PREFIX.copy()
                 .append(
                         text.copyContentOnly()
                                 .formatted( this.MESSAGE_FORMAT )
@@ -182,9 +220,9 @@ public enum Argon
 
     public void sendErrorMessage( String key )
     {
-        Text finalText = namePrefix.copy() .append(
+        Text finalText = NAME_PREFIX.copy() .append(
                 TextFactory.createTranslatable( key )
-                .formatted( this.ERROR_FORMAT ) );
+                .formatted( ERROR_FORMAT ) );
         try
         {
             this.client.player.sendMessage( finalText, false );
@@ -194,9 +232,9 @@ public enum Argon
 
     public void sendErrorMessage( String key, Object... args )
     {
-        Text finalText = namePrefix.copy() .append(
+        Text finalText = NAME_PREFIX.copy() .append(
                 TextFactory.createTranslatable( key, args )
-                .formatted( this.ERROR_FORMAT ) );
+                .formatted( ERROR_FORMAT ) );
 
         try
         {
@@ -207,7 +245,7 @@ public enum Argon
 
     /*public void sendErrorMessage( Text text )
     {
-        Text finalText = namePrefix.copy()
+        Text finalText = NAME_PREFIX.copy()
                 .append(
                         text.copyContentOnly()
                                 .formatted( this.ERROR_FORMAT )
@@ -218,5 +256,4 @@ public enum Argon
         }
         catch ( NullPointerException ignored ) {}
     }*/
-
 }

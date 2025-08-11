@@ -6,7 +6,7 @@ package me.av306.argon.util.render;
  * - I wrote it as an enum
  * - Pretty much everything here uses this enum
  * - My own semantics (looks better in a switch)
- *
+ * <p>
  * use fromInt() to convert :)
  */
 public enum ScreenPosition

@@ -2,27 +2,21 @@ package me.av306.argon.modules.render;
 
 import me.av306.argon.Argon;
 import me.av306.argon.module.AbstractToggleableModule;
-import me.av306.argon.util.render.RenderHelper;
 import me.av306.argon.util.text.TextFactory;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderLayerHelper;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonPart;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.Hoglin;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 
@@ -55,21 +49,18 @@ public class ProximityRadar extends AbstractToggleableModule
     @Override
     public void onDisable() {}
 
-    private ActionResult scanEntities( WorldRenderContext context )
+    private void scanEntities( WorldRenderContext context )
     {
-        RenderHelper.drawTracer( context.matrixStack(), context.tickCounter().getDynamicDeltaTicks(),
-                new Vec3d( 5, 5, 5 ), 0xFFFFFFFF, false );
-
-
+        // TODO: parallisation?
         // Only run the scan if the feature is enabled and essential stuff isn't null
         if (
                 this.isEnabled
-                && Argon.INSTANCE.client.world != null
-                && Argon.INSTANCE.client.player != null
+                && Argon.getInstance().client.world != null
+                && Argon.getInstance().client.player != null
         )
         {
             // Scan each entity
-            Argon.INSTANCE.client.world.getEntities()
+            Argon.getInstance().client.world.getEntities()
                     .forEach( (entity) -> this.handleEntity( context, entity ) );
 
             // Process the results and send the appropriate message
@@ -83,7 +74,7 @@ public class ProximityRadar extends AbstractToggleableModule
                             Double.toString( closestDistance ).substring( 0, 3 )
                     ).formatted( Formatting.RED, Formatting.BOLD );
 
-                    Argon.INSTANCE.client.player.sendMessage( text,  true );
+                    Argon.getInstance().client.player.sendMessage( text,  true );
                 }
 
                 case PLAYER ->
@@ -93,7 +84,7 @@ public class ProximityRadar extends AbstractToggleableModule
                             Double.toString( closestDistance ).substring( 0, 3 )
                     ).formatted( Formatting.RED, Formatting.BOLD );
 
-                    Argon.INSTANCE.client.player.sendMessage( text,  true );
+                    Argon.getInstance().client.player.sendMessage( text,  true );
                 }
 
                 //case ITEM -> // Items don
@@ -104,7 +95,6 @@ public class ProximityRadar extends AbstractToggleableModule
             this.closestDistance = MAX_POSSIBLE_DISTANCE;
         }
 
-        return ActionResult.PASS;
     }
 
 
@@ -118,11 +108,11 @@ public class ProximityRadar extends AbstractToggleableModule
     {
         // Calculate distance to entity
         Vec3d entityPos = entity.getPos();
-        Vec3d clientPos = Argon.INSTANCE.client.player.getPos();
+        Vec3d clientPos = Argon.getInstance().client.player.getPos();
         double distance = entityPos.distanceTo( clientPos );
 
         if ( /*ProximityRadarGroup.detectPlayers &&*/ entity instanceof PlayerEntity
-                && entity != Argon.INSTANCE.client.player
+                && entity != Argon.getInstance().client.player
                 /*&& distance < ProximityRadarGroup.playerRange*/
         )
         {
@@ -142,28 +132,28 @@ public class ProximityRadar extends AbstractToggleableModule
                 /*&& distance < ProximityRadarGroup.hostileRange*/
         )
         {
-            ServerWorld serverWorld = Objects.requireNonNullElse( Argon.INSTANCE.client.player.getServer(), Argon.INSTANCE.client.getServer() )
-                    .getWorld( Argon.INSTANCE.client.world.getRegistryKey() );
+            ServerWorld serverWorld = Objects.requireNonNullElse( Argon.getInstance().client.player.getServer(), Argon.getInstance().client.getServer() )
+                    .getWorld( Argon.getInstance().client.world.getRegistryKey() );
 
 
 
             // Skip neutral zombified piglins
             // FIXME: can't get this to work properly...
             /*if ( entity instanceof ZombifiedPiglinEntity zombifiedPiglin
-                    //&& !zombifiedPiglin.isAngryAt( serverWorld, Argon.INSTANCE.client.player )
-                    //&& zombifiedPiglin.getAngryAt() != Argon.INSTANCE.client.player.getUuid()
-                    //&& Objects.requireNonNull( zombifiedPiglin.getTarget() ).getUuid() == Argon.INSTANCE.client.player.getUuid()
+                    //&& !zombifiedPiglin.isAngryAt( serverWorld, Argon.getInstance().client.player )
+                    //&& zombifiedPiglin.getAngryAt() != Argon.getInstance().client.player.getUuid()
+                    //&& Objects.requireNonNull( zombifiedPiglin.getTarget() ).getUuid() == Argon.getInstance().client.player.getUuid()
             )
             {
                 if ( zombifiedPiglin.getTarget() != null )
                 {
-                    Argon.INSTANCE.LOGGER.info( "{} <=> {};", zombifiedPiglin.getTarget().getUuid(),
-                            Argon.INSTANCE.client.player.getUuid()
+                    Argon.getInstance().LOGGER.info( "{} <=> {};", zombifiedPiglin.getTarget().getUuid(),
+                            Argon.getInstance().client.player.getUuid()
                     );
-                    if ( zombifiedPiglin.getTarget().getUuid() == Argon.INSTANCE.client.player.getUuid() )
+                    if ( zombifiedPiglin.getTarget().getUuid() == Argon.getInstance().client.player.getUuid() )
                         return;
                 }
-                else Argon.INSTANCE.LOGGER.info( "target=null" );
+                else Argon.getInstance().LOGGER.info( "target=null" );
             }*/
 
             if ( distance < this.closestDistance )
@@ -198,7 +188,7 @@ public class ProximityRadar extends AbstractToggleableModule
             //livingEntity.setGlowing( true );
             livingEntity.addStatusEffect( GLOW_EFFECT );
         }*/
-        //Argon.INSTANCE.LOGGER.info( "{}", entity.isGlowing() || entity.isGlowingLocal() );
+        //Argon.getInstance().LOGGER.info( "{}", entity.isGlowing() || entity.isGlowingLocal() );
     }
 
     private void deHighlightEntity( Entity entity )
@@ -213,6 +203,6 @@ public class ProximityRadar extends AbstractToggleableModule
         //FRIENDLY,
         PLAYER,
         ITEM,
-        NONE;
+        NONE
     }
 }

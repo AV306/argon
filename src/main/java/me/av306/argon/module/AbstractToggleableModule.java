@@ -29,9 +29,20 @@ public abstract class AbstractToggleableModule extends AbstractModule
     /**
 	 * Whether this feature should be disabled on exit
 	 */
-	private boolean persistent = false;
-	public void setPersistent( boolean persistent ) { this.persistent = persistent; }
-	public boolean isPersistent() { return this.persistent; }
+	@Deprecated protected boolean persistent = false;
+	@Deprecated public void setPersistent( boolean persistent ) { this.persistent = persistent; }
+	@Deprecated public boolean isPersistent() { return this.persistent; }
+
+    /**
+     * Re-enable module when joining a world?
+     * Replaces {@link #persistent} so that all features can be disabled
+     * when not in a world
+     */
+    protected boolean reEnableOnWorldEnter = false;
+	public boolean shouldReEnableOnWorldEnter()
+	{
+		return this.reEnableOnWorldEnter;
+	}
 
     //protected int key = GLFW.GLFW_KEY_UNKNOWN;
 
@@ -52,9 +63,9 @@ public abstract class AbstractToggleableModule extends AbstractModule
         super( name, key );
 		
 		this.enabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.enabled", name )
-                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.SUCCESS_FORMAT );
         this.disabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.disabled", name )
-                .formatted( Argon.INSTANCE.ERROR_FORMAT );
+                .formatted( Argon.ERROR_FORMAT );
 
         this.commandBuilder.then( literal( "disable" ).executes( context -> { this.disable(); return 1; } ) );
         this.commandBuilder.then( literal( "d" ).executes( context -> { this.disable(); return 1; } ) );
@@ -70,9 +81,9 @@ public abstract class AbstractToggleableModule extends AbstractModule
         super( name, key, aliases );
 
 		this.enabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.enabled", name )
-                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.SUCCESS_FORMAT );
         this.disabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.disabled", name )
-                .formatted( Argon.INSTANCE.SUCCESS_FORMAT );
+                .formatted( Argon.SUCCESS_FORMAT );
 
         // We're registering the things like thrice, but it works, so I'm not complaining
         // FIXME: the time has come. I must complain
@@ -97,12 +108,12 @@ public abstract class AbstractToggleableModule extends AbstractModule
     @Override
     protected void keyEvent()
     {
-        while ( this.keyBinding.wasPressed() && !Argon.INSTANCE.modifierKey.isPressed() )
+        while ( this.keyBinding.wasPressed() && !Argon.getInstance().modifierKey.isPressed() )
         {
             if ( this.forceDisabled )
             {
-                Argon.INSTANCE.LOGGER.warn( "Force-disabled feature enabled: {}", this.name );
-                Argon.INSTANCE.sendErrorMessage( "text.argon.ifeature.blocked", this.name );
+                Argon.getInstance().LOGGER.warn( "Force-disabled feature enabled: {}", this.name );
+                Argon.getInstance().sendErrorMessage( "text.argon.ifeature.blocked", this.name );
             }
         
             else this.toggle();
@@ -116,12 +127,12 @@ public abstract class AbstractToggleableModule extends AbstractModule
 
         this.isEnabled = true;
 
-        Argon.INSTANCE.LOGGER.info( "{} enabled!", this.getName() );
-        Argon.INSTANCE.enabledModules.add( this );
+        Argon.LOGGER.info( "{} enabled!", this.getName() );
+        Argon.getInstance().enabledModules.add( this );
 
         try
         {
-            Argon.INSTANCE.client.player.sendMessage( this.enabledText, true );
+            Argon.getInstance().client.player.sendMessage( this.enabledText, true );
         }
         catch ( NullPointerException ignored ) {} // Features that start enabled will try to send this message and fail
 
@@ -134,13 +145,13 @@ public abstract class AbstractToggleableModule extends AbstractModule
 
         this.isEnabled = false;
 
-        Argon.INSTANCE.LOGGER.info( this.getName() + " disabled!" );
+        Argon.LOGGER.info( "{} disabled!", this.getName() );
 
-        Argon.INSTANCE.enabledModules.remove( this );
+        Argon.getInstance().enabledModules.remove( this );
 
         try
         {
-            Argon.INSTANCE.client.player.sendMessage( this.disabledText, true );
+            Argon.getInstance().client.player.sendMessage( this.disabledText, true );
         }
         catch ( NullPointerException ignored ) {}
 

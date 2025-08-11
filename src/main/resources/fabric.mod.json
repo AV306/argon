@@ -19,9 +19,9 @@
 
   "environment": "client",
   "entrypoints": {
-    "main": [ "me.av306.argon.MainInitializer" ],
-    "client": [ "me.av306.argon.ClientInitializer" ],
-    "preLaunch": [ "me.av306.argon.PreLaunchInitializer" ]
+    "_main": [ "me.av306.argon.Argon" ],
+    "client": [ "me.av306.argon.Argon" ],
+    "preLaunch": [ "me.av306.argon.Argon" ]
   },
   "mixins": [ "argon.mixins.json" ],
 

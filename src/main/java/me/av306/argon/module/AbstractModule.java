@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Base class for all features, to be extended by other feature types and feature implementations.
@@ -41,7 +42,7 @@ public abstract class AbstractModule
  	 * The category for the feature in the keybinds page
    	 * Doesn't do anything outside the keybind registration yet.
    	 */
-	protected String category = "modules";
+	protected final String category = "modules";
 	public String getCategory() { return this.category; }
 
 	/**
@@ -55,7 +56,7 @@ public abstract class AbstractModule
 	/**
 	 * The key the Feature is bound to
 	 */
-	protected int key;
+	protected final int key;
 
 	/**
 	 * The `KeyBinding` instance of the Feature
@@ -70,7 +71,7 @@ public abstract class AbstractModule
 	 */
 	private boolean hide = false;
 	public void setShouldHide( boolean shouldHide ) { this.hide = shouldHide; }
-	public boolean getShouldHide() { return this.hide; }
+	public boolean shouldHideFromModuleList() { return this.hide; }
 
 	protected LiteralCommandNode<FabricClientCommandSource> commandNode;
 	protected final LiteralArgumentBuilder<FabricClientCommandSource> commandBuilder;
@@ -79,7 +80,7 @@ public abstract class AbstractModule
 	 * Constructor that initialises a feature with the given display name, aliases and no default key
 	 * @param name: The Feature's display name
 	 * @param aliases: Aliases for the feature in CP. <i>Technically can</i>, but should not, contain the name in the first argument
-	 * @see #Module(String, int, String...)
+	 * @see #AbstractModule(String, int, String...)
 	 */
 	protected AbstractModule( String name, String... aliases )
 	{
@@ -100,7 +101,7 @@ public abstract class AbstractModule
 		// Register aliases in module registry
 		for ( String alias : aliases )
 		{
-			Argon.INSTANCE.moduleRegistry.put( alias.toLowerCase(), this );
+			Argon.getInstance().moduleRegistry.put( alias.toLowerCase(), this );
 
 			// Register aliases as Brigadier command redirects
 			ClientCommandRegistrationCallback.EVENT.register(
@@ -151,7 +152,7 @@ public abstract class AbstractModule
 
 		// Register display name in CP registry
 		String formattedName = name.replaceAll( " ", "" ).toLowerCase();
-		Argon.INSTANCE.moduleRegistry.put( formattedName, this );
+		Argon.getInstance().moduleRegistry.put( formattedName, this );
 
 		// Register a Brigadier command (native minecraft client command)
 		// FIXME: this causes issues with commands accepting more than one string argument
@@ -247,7 +248,7 @@ public abstract class AbstractModule
 			return;
 		}*/
 
-		Argon.INSTANCE.LOGGER.info( this.getName() + " enabled!" );
+        Argon.LOGGER.info( "{} enabled!", this.getName() );
 
 		//Xenon.INSTANCE.featureManager.getEnabledFeatures().add( this.name );
 
@@ -291,7 +292,7 @@ public abstract class AbstractModule
 					config,
 					value
 			);
-			//Argon.INSTANCE.config.save();
+			//Argon.getInstance().config.save();
 		}
 		else
 		{
@@ -337,10 +338,10 @@ public abstract class AbstractModule
 	}
 
 	/**
-	 * Internal method to handle execution of acttions
+	 * Internal method to handle execution of actions
 	 * @param action: An array containing the command.
 	 */
-    	protected boolean onRequestExecuteAction( String[] action ) { return true; }
+    protected boolean onRequestExecuteAction( String[] action ) { return true; }
 
 	/**
 	 * Method to retrieve help text for a feature.
@@ -348,13 +349,13 @@ public abstract class AbstractModule
 	public Text getHelpText( String argument )
 	{
 		// TODO: add formatting
-		return TextFactory.createLiteral( "Whoops! This Feature doesn't have any documentation :(" );
+		return TextFactory.createLiteral( "Whoops! This module doesn't have any documentation :(" );
 	}
 
 
 	protected void sendInfoMessage( Text text )
 	{
-		Text message = Argon.INSTANCE.getNamePrefixCopy().append(
+		Text message = Argon.getInstance().getNamePrefixCopy().append(
 				TextFactory.createTranslatable(
 						"text.argon.message",
 						this.name,
@@ -362,16 +363,16 @@ public abstract class AbstractModule
 				)
 		);
 
-		try
-		{
-			Argon.INSTANCE.client.player.sendMessage( message, false );
-		}
-		catch ( NullPointerException ignored ) {}
+        try
+        {
+            Argon.getInstance().client.player.sendMessage( message, false );
+        }
+        catch ( NullPointerException ignored ) {}
 	}
 
 	protected void sendInfoMessage( String key, Object... args )
 	{
-		Text message = Argon.INSTANCE.getNamePrefixCopy().append(
+		Text message = Argon.getInstance().getNamePrefixCopy().append(
 				TextFactory.createTranslatable(
 						"text.argon.message",
 						this.name,
@@ -380,24 +381,27 @@ public abstract class AbstractModule
 		);
 
 		try
-		{
-			Argon.INSTANCE.client.player.sendMessage( message, false );
-		}
-		catch ( NullPointerException ignored ) {}
+        {
+            Argon.getInstance().client.player.sendMessage( message, false );
+        }
+        catch ( NullPointerException ignored ) {}
 	}
 
 	protected void sendErrorMessage( String key, Object... args )
 	{
-		Text message = Argon.INSTANCE.getNamePrefixCopy().append(TextFactory.createTranslatable("text.argon.message",
-						this.name,
-						TextFactory.createTranslatable( key, args ).formatted(Argon.INSTANCE.ERROR_FORMAT )
-				)
-		);
+		Text message = Argon.getInstance().getNamePrefixCopy()
+                .append( TextFactory.createTranslatable(
+                        "text.argon.message", this.name, TextFactory.createTranslatable( key, args ) )
+                        .formatted( Argon.ERROR_FORMAT )
+                );
 
 		try
-		{
-			Argon.INSTANCE.client.player.sendMessage( message, false );
-		}
-		catch ( NullPointerException ignored ) {}
+        {
+            Argon.getInstance().client.player.sendMessage( message, false );
+        }
+        // Sometimes, modules will try to send messages before the player
+        // exists, e.g. those that start enabled. We don't need to worry about
+        // that, so we ignore the NPE.
+        catch ( NullPointerException ignored ) {}
 	}
 }
