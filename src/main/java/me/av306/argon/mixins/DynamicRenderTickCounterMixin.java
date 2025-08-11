@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class DynamicRenderTickCounterMixin
 {
     @Shadow
-    private float dynamicDeltaTicks;
+    private float dynamicDeltaTicks; // Same as lastFrameDuration c. 1.20.4
 
     @Inject(
             at = @At(

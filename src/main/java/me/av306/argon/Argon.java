@@ -68,6 +68,8 @@ public enum Argon
     {
         LOGGER.info( "Hello from Argon client init!" );
 
+        this.readVersionData();
+
         this.client = MinecraftClient.getInstance();
 
         this.modifierKey = KeybindUtil.registerKeybind(
@@ -96,7 +98,7 @@ public enum Argon
 
         // Remove restrictions
         for ( AbstractModule module : this.moduleRegistry.values() )
-            module .setForceDisabled( false );
+            module.setForceDisabled( false );
     }
 
 
@@ -108,6 +110,11 @@ public enum Argon
         // Get version string
         Version ver = modContainer.getMetadata().getVersion();
         this.versionString = ver.getFriendlyString();
+    }
+
+    public String getVersionString()
+    {
+        return this.versionString;
     }
 
 
