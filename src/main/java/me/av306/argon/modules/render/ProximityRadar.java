@@ -57,10 +57,7 @@ public class ProximityRadar extends AbstractToggleableModule
 
     private ActionResult scanEntities( WorldRenderContext context )
     {
-        RenderHelper.drawTracer( context.matrixStack(), context.tickCounter().getDynamicDeltaTicks(),
-                new Vec3d( 5, 5, 5 ), 0xFFFFFFFF, false );
-
-
+        // TODO: parallisation?
         // Only run the scan if the feature is enabled and essential stuff isn't null
         if (
                 this.isEnabled

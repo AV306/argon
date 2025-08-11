@@ -1,13 +1,14 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "me.av306.argon.mixin",
+  "package": "me.av306.argon.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
 
   ],
   "client": [
-      ],
+      "DynamicRenderTickCounterMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

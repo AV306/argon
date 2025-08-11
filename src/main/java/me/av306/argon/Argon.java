@@ -3,6 +3,7 @@ package me.av306.argon;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import me.av306.argon.modules.movement.Timer;
 import me.av306.argon.modules.render.ProximityRadar;
 import me.av306.argon.util.KeybindUtil;
 import org.lwjgl.glfw.GLFW;
@@ -76,9 +77,10 @@ public enum Argon
         );
 
         new ProximityRadar();
+        new Timer();
     }
 
-    private final Text namePrefix = TextFactory.createLiteral( "[Xenon] " )
+    private final Text namePrefix = TextFactory.createLiteral( "[Argon] " )
             .formatted( this.MESSAGE_FORMAT );
 
     public MutableText getNamePrefixCopy() { return namePrefix.copy(); }
@@ -102,7 +104,7 @@ public enum Argon
     private void readVersionData()
     {
         //assert FabricLoader.getInstance().getModContainer( "xenon" ).isPresent();
-        this.modContainer = FabricLoader.getInstance().getModContainer( "xenon" ).get();
+        this.modContainer = FabricLoader.getInstance().getModContainer( this.MODID ).get();
         // Get version string
         Version ver = modContainer.getMetadata().getVersion();
         this.versionString = ver.getFriendlyString();
