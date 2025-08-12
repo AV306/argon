@@ -14,18 +14,26 @@ public class RenderHelper
         return Argon.INSTANCE.client.getBufferBuilders().getEntityVertexConsumers();
     }
 
-    public static void drawTracer( MatrixStack matrices, float partialTicks,
-                                   Vec3d end, int color, boolean depthTest )
+    public static void drawTest( VertexConsumerProvider vertexConsumerProvider, MatrixStack matrices, float partialTicks,
+                                   Vec3d pos, int color )
     {
-        VertexConsumerProvider.Immediate vertexConsumers = getEntityVertexConsumers();
-        RenderLayer layer = CustomRenderLayers.OVERLAY_LINES;
-        VertexConsumer buffer = vertexConsumers.getBuffer( layer );
+        //VertexConsumerProvider.Immediate vertexConsumerProvider = getEntityVertexConsumers();
+        RenderLayer layer = CustomRenderLayers.OVERLAY_LINE_STRIP;
+        VertexConsumer buffer = vertexConsumerProvider.getBuffer( layer );
 
-        Vec3d start = new Vec3d( 0, 0, 1 );
+        buffer.vertex( (float) pos.x, (float) pos.y, (float) pos.z ).color( color );
+        buffer.vertex( (float) pos.x + 5, (float) pos.y, (float) pos.z ).color( color );
+        buffer.vertex( (float) pos.x + 5, (float) pos.y + 5, (float) pos.z ).color( color );
+        buffer.vertex( (float) pos.x, (float) pos.y + 5, (float) pos.z ).color( color );
+        buffer.vertex( (float) pos.x, (float) pos.y, (float) pos.z ).color( color );
 
-        buffer.vertex( (float) start.x, (float) start.y, (float) start.z ).color( 0xFFFFFFFF );
-        buffer.vertex( (float) end.x, (float) end.y, (float) end.z ).color( 0xFFFFFFFF );
-
-        vertexConsumers.draw( layer );
+        //vertexConsumerProvider.draw( layer );
     }
+
+    public static void drawTest2( MatrixStack matrices, float partialTicks,
+                                   Vec3d pos, int color )
+    {
+        drawTest( getEntityVertexConsumers(), matrices, partialTicks, pos, color );
+    }
+
 }

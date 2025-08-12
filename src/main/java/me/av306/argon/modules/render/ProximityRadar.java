@@ -45,7 +45,7 @@ public class ProximityRadar extends AbstractToggleableModule
         /*GameRenderEvents.RENDER_WORLD.register(
                 (tickDelta, limitTime, matrices) -> this.scanEntities( matrices )
         );*/
-        WorldRenderEvents.BEFORE_ENTITIES.register( this::scanEntities );
+        WorldRenderEvents.AFTER_ENTITIES.register( this::scanEntities );
     }
 
     @Override
@@ -57,6 +57,16 @@ public class ProximityRadar extends AbstractToggleableModule
 
     private ActionResult scanEntities( WorldRenderContext context )
     {
+        RenderHelper.drawTest( context.consumers(), context.matrixStack(),
+                context.tickCounter().getDynamicDeltaTicks(), Argon.INSTANCE.client.player.getPos(),
+                0xFFFFFFFF );
+                
+        RenderHelper.drawTest2( context.matrixStack(),
+                context.tickCounter().getDynamicDeltaTicks(), Argon.INSTANCE.client.player.getPos(),
+                0xFFFFFFFF );
+
+        //RenderHelper.drawText2( VertexConsumerProvider.immediate( ))
+
         // TODO: parallisation?
         // Only run the scan if the feature is enabled and essential stuff isn't null
         if (
