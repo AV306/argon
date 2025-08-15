@@ -21,9 +21,14 @@ import java.util.Iterator;
  */
 public class TextUtil
 {
-    public static int MARGIN = 5;
+    public static int MARGIN = 2;
     public static int LINE_SPACING = 2;
-    /*public static void drawTestText( DrawContext drawContext )
+    public static int ONE_LINE_OFFSET = 12; // textRenderer.fontHeight + LINE_SPACING
+
+    /**
+     * Draw a set of alignment text
+     */
+    public static void drawTestText( DrawContext drawContext )
     {
         TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
         int scaledWidth = Argon.getInstance().client.getWindow().getScaledWidth();
@@ -32,9 +37,16 @@ public class TextUtil
         // 0, 0
         drawContext.drawText( textRenderer, "(0, 0)", 0, 0, 0xFFFFFFFF, false );
 
-        // W, 0
-        //drawContext.drawText( textRenderer, "(" + scaledWidth + ", 0)", scaledWidth, 0, 0xFFFFFFFF, false );
-    }*/
+        String centreText = "(" + scaledWidth/2 + ", " + scaledHeight/2 + ")";
+        drawContext.drawText( textRenderer, centreText,
+                (scaledWidth - textRenderer.getWidth( centreText )) / 2,
+                (scaledHeight - textRenderer.fontHeight) / 2,
+                0xFFFFFFFF, false );
+        
+        String bottomText = "(" + scaledWidth + ", " + scaledHeight + ")";
+        drawContext.drawText( textRenderer, bottomText, scaledWidth - textRenderer.getWidth( bottomText ),
+                scaledHeight - textRenderer.fontHeight, 0xFFFFFFFF, false );
+    }
 
     // TODO: do we want to split the position up into top/centre/bottom, left/centre/right?
 	public static void drawPositionedText(
@@ -104,11 +116,11 @@ public class TextUtil
 
 		try
 		{
-			color = formatting.getColorValue();
+			color = formatting.getColorValue() | 0xFF000000;
 		}
 		catch( NullPointerException npe )
 		{
-			color = ColorUtil.WHITE;
+			color = 0xFFFFFFFF;
 		}
 
 		TextUtil.drawPositionedText( context, text, position, xOffset, yOffset, shadow, color );
@@ -231,7 +243,7 @@ public class TextUtil
         ScreenPosition position,
         int xOffset, int yOffset,
         boolean shadow,
-        Formatting formatting
+        int color
     )
     {
         TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
@@ -255,8 +267,9 @@ public class TextUtil
             {
                 case TOP_LEFT ->
                 {
+                    //Argon.LOGGER.info( "text at = ({}, {})", x, y );
                     drawContext.drawText( textRenderer, texts.next(), x, y,
-                            formatting.getColorValue(), shadow );
+                            color, shadow );
                     
                     y += textRenderer.fontHeight + LINE_SPACING;
                 }
@@ -265,16 +278,18 @@ public class TextUtil
                 {
                     String text = texts.next();
                     int startX = x - textRenderer.getWidth( text );
-                    drawContext.drawText( textRenderer, texts.next(), startX, y,
-                            formatting.getColorValue(), shadow );
+                    //Argon.LOGGER.info( "text at = ({}, {})", x, y );
+                    drawContext.drawText( textRenderer, text, startX, y,
+                            color, shadow );
                     y += textRenderer.fontHeight + LINE_SPACING;
                     
                 }
 
                 case BOTTOM_LEFT ->
                 {
+                    //Argon.LOGGER.info( "text at = ({}, {})", x, y );
                     drawContext.drawText( textRenderer, texts.next(), x, y,
-                            formatting.getColorValue(), shadow );
+                            color, shadow );
                     
                     y -= textRenderer.fontHeight + LINE_SPACING;
                 }
@@ -283,10 +298,10 @@ public class TextUtil
                 {
                     String text = texts.next();
                     int startX = x - textRenderer.getWidth( text );
+                    //Argon.LOGGER.info( "text at = ({}, {})", x, y );
                     drawContext.drawText( textRenderer, texts.next(), startX, y,
-                            formatting.getColorValue(), shadow );
+                            color, shadow );
                     y -= textRenderer.fontHeight + LINE_SPACING;
-                    
                 }
 
                 default -> Argon.LOGGER.error( "TextUtil.drawPositionedTexts() called with position " + position.toString() + " that is not implemented yet!" );

@@ -1,40 +1,37 @@
 package me.av306.argon;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import me.av306.argon.modules.ModuleList;
-import me.av306.argon.modules.movement.Timer;
-import me.av306.argon.modules.render.ProximityRadar;
-import me.av306.argon.util.KeybindUtil;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
-import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import me.av306.argon.events.MinecraftClientEvents;
 import me.av306.argon.module.AbstractModule;
 import me.av306.argon.module.AbstractToggleableModule;
+import me.av306.argon.modules.ModuleList;
+import me.av306.argon.modules.movement.Timer;
+import me.av306.argon.modules.render.ProximityRadar;
+import me.av306.argon.util.KeybindUtil;
 import me.av306.argon.util.text.TextFactory;
-
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.Version;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.ListIterator;
 
-//#endregion
-
-// FIXME: not sure about the suitability of the enum singleton pattern
 public class Argon implements ClientModInitializer, PreLaunchEntrypoint
 {
     private static final Argon INSTANCE = new Argon();
-
     public static Argon getInstance()
     {
         return INSTANCE;
@@ -43,25 +40,33 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
     public static final String MOD_ID = "argon";
     public static final boolean debug = true;
 
+    public static final Formatting SUCCESS_FORMAT = Formatting.GREEN;
+    public static final Formatting MESSAGE_FORMAT = Formatting.AQUA;
+    public static final Formatting WARNING_FORMAT = Formatting.YELLOW;
+    public static final Formatting ERROR_FORMAT = Formatting.RED;
+    
+    private static ModContainer MOD_CONTAINER;
+    public static String VERSION_STRING;
+    public static String getVersionString()
+    {
+        return VERSION_STRING;
+    }
+
+    private static final Text NAME_PREFIX =
+            TextFactory.createLiteral( "[Argon] " ).formatted( MESSAGE_FORMAT );
+    public static MutableText getNamePrefixCopy() { return NAME_PREFIX.copy(); }
+    
     public static final Logger LOGGER = LoggerFactory.getLogger( MOD_ID );
+
     public KeyBinding modifierKey;
 
     public MinecraftClient client;
     //public MinecraftClientAccessor clientAccessor;
 
-    public static final Formatting SUCCESS_FORMAT = Formatting.GREEN;
-    public static final Formatting MESSAGE_FORMAT = Formatting.AQUA;
-    public static final Formatting WARNING_FORMAT = Formatting.YELLOW;
-    public static final Formatting ERROR_FORMAT = Formatting.RED;
-
-
     public final HashMap<String, AbstractModule> moduleRegistry = new HashMap<>();
     public final ArrayList<AbstractToggleableModule> enabledModules = new ArrayList<>();
 
     //public HashMap<String, Command> commandRegistry = new HashMap<>();
-
-    public ModContainer modContainer;
-    public String versionString;
 
     // The instance that the init methods are called on isn't guaranteed to be
     // the same, which is super annoying because I have instance stuff going on
@@ -72,6 +77,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
     public void onPreLaunch()
     {
         INSTANCE.initPrelaunch();
+        readVersionData();
     }
 
     @Override
@@ -81,6 +87,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
         // Call the singleton's init method
         INSTANCE.initClient();
     }
+
 
     private void initPrelaunch()
     {
@@ -101,52 +108,49 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
                 "modules"
         );
 
+        MinecraftClientEvents.DISCONNECT.register(
+                (screen, transferring) -> this.disableAllFeatures() );
+
+        // TODO: It just occured to me that these could be GC'ed
+        // Although I've never seen it happen.
+        // Hmm, maybe the event stuff keeps them alive...
         new ModuleList();
         new ProximityRadar();
         new Timer();
     }
 
-    private static final Text NAME_PREFIX = TextFactory.createLiteral( "[Argon] " )
-            .formatted( MESSAGE_FORMAT );
-
-    public static MutableText getNamePrefixCopy() { return NAME_PREFIX.copy(); }
 
     public void disableAllFeatures()
     {
-        // FIXME: This feels very inefficient
-        Argon.getInstance().LOGGER.info( "Exiting world, disabling all features" );
+        // FIXME: don't disable all when transferring?
+        Argon.LOGGER.info( "Disconnected, disabling all features" );
 
-        ArrayList<AbstractToggleableModule> enabledModules_copy = new ArrayList<>( this.enabledModules );
-        for ( AbstractToggleableModule module : enabledModules_copy )
-            if ( !module.isPersistent() ) module.disable();
-
-        // Remove restrictions
-        for ( AbstractModule module : this.moduleRegistry.values() )
-            module.setForceDisabled( false );
+        ListIterator<AbstractToggleableModule> enabledModulesIterator = this.enabledModules.listIterator();
+        while ( enabledModulesIterator.hasNext() )
+        {
+            var module = enabledModulesIterator.next();
+            //if ( module.)
+            module.disable( java.util.Optional.of( enabledModulesIterator ) );
+            //enabledModulesIterator.remove();
+        }
     }
 
 
     // Mod Menu handles update checks for us :)
-    private void readVersionData()
+    private static void readVersionData()
     {
-        //assert FabricLoader.getInstance().getModContainer( "xenon" ).isPresent();
-        this.modContainer = FabricLoader.getInstance().getModContainer( MOD_ID ).get();
-        // Get version string
-        Version ver = modContainer.getMetadata().getVersion();
-        this.versionString = ver.getFriendlyString();
+        MOD_CONTAINER = FabricLoader.getInstance().getModContainer( MOD_ID ).get();
+        Version ver = MOD_CONTAINER.getMetadata().getVersion();
+        VERSION_STRING = ver.getFriendlyString();
     }
 
-    public String getVersionString()
-    {
-        return this.versionString;
-    }
 
     public Identifier argonIdentifier( String path )
     {
         return Identifier.of( MOD_ID, path );
     }
 
-
+    // #region Message-sending
     
     public void sendInfoMessage( String key )
     {
@@ -256,4 +260,6 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
         }
         catch ( NullPointerException ignored ) {}
     }*/
+
+    // #endregion
 }

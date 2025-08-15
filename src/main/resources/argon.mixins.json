@@ -7,7 +7,8 @@
     ],
     "client": [
         "DynamicRenderTickCounterMixin",
-        "MinecraftClientAccessor"
+        "MinecraftClientAccessor",
+        "MinecraftClientMixin"
     ],
     "injectors": {
         "defaultRequire": 1

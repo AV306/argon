@@ -69,7 +69,7 @@ public class ProximityRadar extends AbstractToggleableModule
             {
                 case HOSTILE ->
                 {
-                    text = TextFactory.createTranslatable(
+                    text = Text.translatable(
                             "text.argon.proximityradar.hostile",
                             Double.toString( closestDistance ).substring( 0, 3 )
                     ).formatted( Formatting.RED, Formatting.BOLD );
@@ -79,22 +79,22 @@ public class ProximityRadar extends AbstractToggleableModule
 
                 case PLAYER ->
                 {
-                    text = TextFactory.createTranslatable(
+                    text = Text.translatable(
                             "text.argon.proximityradar.player",
                             Double.toString( closestDistance ).substring( 0, 3 )
-                    ).formatted( Formatting.RED, Formatting.BOLD );
+                    ).formatted( Formatting.WHITE, Formatting.BOLD );
 
                     Argon.getInstance().client.player.sendMessage( text,  true );
                 }
 
                 //case ITEM -> // Items don
+                default -> {}
             }
 
             // Reset the closest detected distance and entityScanResult
             this.entityScanResult = EntityScanResult.NONE;
             this.closestDistance = MAX_POSSIBLE_DISTANCE;
         }
-
     }
 
 
@@ -132,8 +132,8 @@ public class ProximityRadar extends AbstractToggleableModule
                 /*&& distance < ProximityRadarGroup.hostileRange*/
         )
         {
-            ServerWorld serverWorld = Objects.requireNonNullElse( Argon.getInstance().client.player.getServer(), Argon.getInstance().client.getServer() )
-                    .getWorld( Argon.getInstance().client.world.getRegistryKey() );
+            //ServerWorld serverWorld = Objects.requireNonNullElse( Argon.getInstance().client.player.getServer(), Argon.getInstance().client.getServer() )
+            //        .getWorld( Argon.getInstance().client.world.getRegistryKey() );
 
 
 

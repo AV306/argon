@@ -1,27 +1,30 @@
 package me.av306.argon.module;
 
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import org.lwjgl.glfw.GLFW;
+
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+import com.mojang.brigadier.context.CommandContextBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+
 import me.av306.argon.Argon;
 import me.av306.argon.util.text.TextFactory;
-
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.LiteralCommandNode;
-
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
-
-import org.lwjgl.glfw.GLFW;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Base class for all features, to be extended by other feature types and feature implementations.
@@ -70,7 +73,7 @@ public abstract class AbstractModule
 	 * Sets whether this Feature should be hidden in FeatureList
 	 */
 	private boolean hide = false;
-	public void setShouldHide( boolean shouldHide ) { this.hide = shouldHide; }
+	public void setShouldHideFromModuleList( boolean shouldHide ) { this.hide = shouldHide; }
 	public boolean shouldHideFromModuleList() { return this.hide; }
 
 	protected LiteralCommandNode<FabricClientCommandSource> commandNode;
@@ -105,8 +108,7 @@ public abstract class AbstractModule
 
 			// Register aliases as Brigadier command redirects
 			ClientCommandRegistrationCallback.EVENT.register(
-                    (dispatcher, registryAccess) ->
-					dispatcher.register(
+                    (dispatcher, registryAccess) -> dispatcher.register(
 							ClientCommandManager.literal( alias )
 									.executes( context -> { this.toggleOrElseEnable(); return 1; } )
 									.redirect( this.commandNode )
@@ -150,56 +152,72 @@ public abstract class AbstractModule
 		KeyBindingHelper.registerKeyBinding( this.keyBinding );
 		ClientTickEvents.END_CLIENT_TICK.register( client -> this.keyEvent() );
 
-		// Register display name in CP registry
+		// Register display name in registry
 		String formattedName = name.replaceAll( " ", "" ).toLowerCase();
-		Argon.getInstance().moduleRegistry.put( formattedName, this );
+		Argon.getInstance().moduleRegistry.put( formattedName, this ); // Leaky `this`
 
 		// Register a Brigadier command (native minecraft client command)
 		// FIXME: this causes issues with commands accepting more than one string argument
+		// FIXME: ^ I thought I fixed that...
 		this.commandBuilder = ClientCommandManager.literal( formattedName )
 				.executes( context -> { this.toggleOrElseEnable(); return 1; } );
 
-		this.commandBuilder.then( ClientCommandManager.literal( "enable" ).executes( context -> { this.enable(); return 1; } ) );
-		this.commandBuilder.then( ClientCommandManager.literal( "e" ).executes( context -> { this.enable(); return 1; } ) ); // Enable alias
-		
+		// "enable | e" command
 		this.commandBuilder.then(
+				ClientCommandManager.literal( "enable" )
+						.executes( context -> { this.enable(); return 1; } )
+		);
+		this.commandBuilder.then(
+				ClientCommandManager.literal( "e" )
+						.executes( context -> { this.enable(); return 1; } )
+		);
+		
+		/*this.commandBuilder.then(
 				ClientCommandManager.literal( "help" )
 						.executes( context ->
 						{
-						this.sendInfoMessage( this.getHelpText( null ) );
-						return 1;
+							this.sendInfoMessage( this.getHelpText( null ) );
+							return 1;
 						} )
-						.then( ClientCommandManager.argument( "keyword", StringArgumentType.word() )
-								.executes( context ->
-								{
-									this.sendInfoMessage( this.getHelpText( StringArgumentType.getString( context, "keyword" ) ) );
-									return 1;
-								} )
-						)
-		);
+						.then(
+								ClientCommandManager.argument( "keyword", StringArgumentType.word() )
+										.executes( context ->
+										{
+											this.sendInfoMessage( this.getHelpText( StringArgumentType.getString( context, "keyword" ) ) );
+											return 1;
+										} )
+							)
+		);*/
 
-		this.commandBuilder.then(
-			ClientCommandManager.literal( "set" )
-					.then(
-							ClientCommandManager.argument( "config", StringArgumentType.string() )
-									.then( ClientCommandManager.argument( "value", StringArgumentType.string() )
-											.executes( context ->
-											{
-												this.requestConfigChange(
-														StringArgumentType.getString( context, "config" ),
-														StringArgumentType.getString( context, "value" )
-												);
-												return 1;
-											} )
-									)
-					)
-		);
+		// Argument builder for "set" command subtree
+		LiteralArgumentBuilder<FabricClientCommandSource> configSetterNode =
+				ClientCommandManager.literal( "set" );
 
-		// Register command
-		ClientCommandRegistrationCallback.EVENT.register(
-				(dispatcher, registryAccess) -> this.commandNode = dispatcher.register( this.commandBuilder )
-		);
+		// Let submodules override getConfigCommandArguments() to return a stream of
+		// command subtrees, one for each config; these are appended onto the "set"
+		// command node
+		this.getConfigCommandArguments().ifPresent( stream ->
+			stream.parallel().forEach( configSetterNode::then ) );
+		this.commandBuilder.then( configSetterNode );
+
+		// Register overall command tree for this module
+		ClientCommandRegistrationCallback.EVENT.register( (dispatcher, registryAccess) ->
+				this.commandNode = dispatcher.register( this.commandBuilder ) );
 	}
+
+	// The inheritance of the ArgumentBuilders is ducking weird
+	protected Optional<Stream<? extends ArgumentBuilder<FabricClientCommandSource, ? extends Object>>> getConfigCommandArguments()
+	{
+		return Optional.empty();
+	}
+	
+	// This works
+	/*{
+		return Stream.of(
+			ClientCommandManager.literal( "test" ).executes( context -> 1 ),
+			ClientCommandManager.argument( "anystring", StringArgumentType.string() ).executes( context -> 1 )
+		);
+	}*/
 
 	/*protected ActionResult onKeyboardKey( long window, int key, int scanCode, int action, int modifiers )
 	{

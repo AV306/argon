@@ -23,7 +23,7 @@ public class ModuleList extends AbstractToggleableModule
         super( "ModuleList" );
 
         // Hide FL from the list and don't disable it on exit
-        this.setShouldHide( true );
+        this.setShouldHideFromModuleList( true );
         //this.setPersistent( true );
         this.reEnableOnWorldEnter = true;
 
@@ -31,9 +31,9 @@ public class ModuleList extends AbstractToggleableModule
         this.enable();
 
         // Version data should already be initialised at this time
-        this.versionText = TextFactory.createTranslatable(
-                "text.argon.version", Argon.getInstance().getVersionString()
-        );
+        this.versionText = Text.translatable(
+                "text.argon.modulelist.version", Argon.getVersionString() );
+        Argon.LOGGER.info( "ModuleList versionText = {}", this.versionText  );
 
         // register render listener
         //HudRenderCallback.EVENT.register( this::onInGameHudRender );
@@ -43,6 +43,7 @@ public class ModuleList extends AbstractToggleableModule
         ClientPlayConnectionEvents.JOIN.register( (handler, sender, client) ->
         {
             //if ( FeatureListGroup.reEnableOnWorldEnter )
+            Argon.LOGGER.info( "client join" );
             this.enable();
         } );
     }
@@ -55,18 +56,20 @@ public class ModuleList extends AbstractToggleableModule
         final ScreenPosition position = ScreenPosition.TOP_RIGHT; //FeatureListGroup.position;
 
         // Version text
+        //Argon.LOGGER.info( this.versionText.getLiteralString() );
         TextUtil.drawPositionedText( drawContext, this.versionText, position,
                 0, 0, false, Argon.SUCCESS_FORMAT );
 
         Iterator<String> moduleNames = Argon.getInstance().enabledModules.stream()
                 .parallel()
-                .filter( module -> module.shouldHideFromModuleList() )
+                //.map( module -> { Argon.LOGGER.info( "\t{}", module.getName() ); return module; } )
+                .filter( module -> !module.shouldHideFromModuleList() )
                 .map( module -> module.getName() )
                 .iterator();
 
         // Module names
         TextUtil.drawPositionedTexts( drawContext, moduleNames, position,
-            0, 0, false, Argon.SUCCESS_FORMAT );
+            0, TextUtil.ONE_LINE_OFFSET, false, 0xFFFFFFFF );
     }
 
     @Override

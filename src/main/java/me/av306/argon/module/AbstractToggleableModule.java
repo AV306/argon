@@ -9,6 +9,10 @@ import org.lwjgl.glfw.GLFW;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Optional;
+
 public abstract class AbstractToggleableModule extends AbstractModule
 {
 	/**
@@ -123,12 +127,25 @@ public abstract class AbstractToggleableModule extends AbstractModule
     @Override
     public void enable()
     {
+        this.enable( Optional.empty() );
+    }
+
+    public void enable( Optional<ListIterator<AbstractToggleableModule>> optionalListIterator )
+    {
         if ( this.isEnabled ) return; // safety
 
         this.isEnabled = true;
 
         Argon.LOGGER.info( "{} enabled!", this.getName() );
-        Argon.getInstance().enabledModules.add( this );
+
+        // If an iterator is available, i.e. the caller is iterating through some list
+        // containing ATMs, modify that iterator to prevent concurrent modification
+        // Otherwise add it to the enabled modules list normallt
+
+        optionalListIterator.ifPresentOrElse(
+                iterator -> iterator.add( this ),
+                () -> Argon.getInstance().enabledModules.add( this )
+        );
 
         try
         {
@@ -141,13 +158,21 @@ public abstract class AbstractToggleableModule extends AbstractModule
 
     public void disable()
     {
+        this.disable( Optional.empty() );
+    }
+
+    public void disable( Optional<ListIterator<AbstractToggleableModule>> listIterator )
+    {
         if ( !this.isEnabled ) return; // safety catch
 
         this.isEnabled = false;
 
         Argon.LOGGER.info( "{} disabled!", this.getName() );
 
-        Argon.getInstance().enabledModules.remove( this );
+        listIterator.ifPresentOrElse(
+            iterator -> iterator.remove(),
+            () -> Argon.getInstance().enabledModules.remove( this )
+        );
 
         try
         {
