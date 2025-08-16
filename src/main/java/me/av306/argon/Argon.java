@@ -1,6 +1,7 @@
 package me.av306.argon;
 
 
+import me.av306.argon.modules.SimpleAutoTool;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +99,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
     {
         LOGGER.info( "Hello from Argon client init!" );
 
-        this.readVersionData();
+        readVersionData();
 
         this.client = MinecraftClient.getInstance();
 
@@ -117,6 +118,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
         new ModuleList();
         new ProximityRadar();
         new Timer();
+        //new SimpleAutoTool();
     }
 
 
@@ -145,7 +147,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
     }
 
 
-    public Identifier argonIdentifier( String path )
+    public static Identifier argonIdentifier( String path )
     {
         return Identifier.of( MOD_ID, path );
     }

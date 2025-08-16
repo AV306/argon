@@ -1,6 +1,8 @@
 {
-  "text.argon.modulelist.version": "Argon %s",
-  "text.argon.message": "[Argon] %s",
-  "text.argon.proximityradar.hostile": "HOSTILE MOB (%s)",
-  "text.argon.proximityradar.plater": "PLAYER (%s)"
+    "text.argon.toggleablemodule.enabled": "%s ENABLED",
+    "text.argon.toggleablemodule.disabled": "%s DISABLED",
+    "text.argon.modulelist.version": "Argon %s",
+    "text.argon.message": "[Argon] %s",
+    "text.argon.proximityradar.hostile": "HOSTILE MOB (%s)",
+    "text.argon.proximityradar.plater": "PLAYER (%s)"
 }

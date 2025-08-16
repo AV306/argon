@@ -66,9 +66,9 @@ public abstract class AbstractToggleableModule extends AbstractModule
     {
         super( name, key );
 		
-		this.enabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.enabled", name )
+		this.enabledText = TextFactory.createTranslatable( "text.argon.toggleablemodule.enabled", name )
                 .formatted( Argon.SUCCESS_FORMAT );
-        this.disabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.disabled", name )
+        this.disabledText = TextFactory.createTranslatable( "text.argon.toggleablemodule.disabled", name )
                 .formatted( Argon.ERROR_FORMAT );
 
         this.commandBuilder.then( literal( "disable" ).executes( context -> { this.disable(); return 1; } ) );

@@ -7,8 +7,10 @@
     ],
     "client": [
         "DynamicRenderTickCounterMixin",
+        "HandledScreenMixin",
         "MinecraftClientAccessor",
-        "MinecraftClientMixin"
+        "MinecraftClientMixin",
+        "SplashTextResourceSupplierMixin"
     ],
     "injectors": {
         "defaultRequire": 1

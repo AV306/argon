@@ -3,6 +3,7 @@ package me.av306.argon.modules;
 import java.util.Iterator;
 
 import me.av306.argon.Argon;
+import me.av306.argon.module.AbstractModule;
 import me.av306.argon.module.AbstractToggleableModule;
 import me.av306.argon.util.render.ScreenPosition;
 import me.av306.argon.util.text.TextFactory;
@@ -33,11 +34,10 @@ public class ModuleList extends AbstractToggleableModule
         // Version data should already be initialised at this time
         this.versionText = Text.translatable(
                 "text.argon.modulelist.version", Argon.getVersionString() );
-        Argon.LOGGER.info( "ModuleList versionText = {}", this.versionText  );
 
         // register render listener
         //HudRenderCallback.EVENT.register( this::onInGameHudRender );
-        HudElementRegistry.addLast( Argon.getInstance().argonIdentifier( "argon_hud" ), this::onInGameHudRender );
+        HudElementRegistry.addLast( Argon.argonIdentifier( "argon_hud" ), this::onInGameHudRender );
 
         // FIXME: this event may not be good
         ClientPlayConnectionEvents.JOIN.register( (handler, sender, client) ->
@@ -57,14 +57,15 @@ public class ModuleList extends AbstractToggleableModule
 
         // Version text
         //Argon.LOGGER.info( this.versionText.getLiteralString() );
-        TextUtil.drawPositionedText( drawContext, this.versionText, position,
-                0, 0, false, Argon.SUCCESS_FORMAT );
+        if ( shouldShowVersion )
+            TextUtil.drawPositionedText( drawContext, this.versionText, position,
+                    0, 0, false, Argon.SUCCESS_FORMAT );
 
         Iterator<String> moduleNames = Argon.getInstance().enabledModules.stream()
                 .parallel()
                 //.map( module -> { Argon.LOGGER.info( "\t{}", module.getName() ); return module; } )
                 .filter( module -> !module.shouldHideFromModuleList() )
-                .map( module -> module.getName() )
+                .map( AbstractModule::getName )
                 .iterator();
 
         // Module names
