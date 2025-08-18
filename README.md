@@ -1,6 +1,8 @@
-# argon
+m# argon
 
-A lighter, more well-rounded spiritual successor to [Xenon](https://github.com/AV306/xenon) for newer versions!
+Some other utilities for the block game.
+
+[Xenon](https://github.com/AV306/xenon)'s spiritual successor for newer versions!
 
 ## Old features
 
@@ -8,22 +10,24 @@ A lighter, more well-rounded spiritual successor to [Xenon](https://github.com/A
 - Timer
 - HealthDisplay (planned)
 - Panorama Generator (planned)
+- Portal GUI unlock (planned)
+- Infinite chat length (planned)
 
 ## ✨New features✨
 - AutoTools (planned) (because the original AutoTool mod hasn't been updated)
 - Display external mods in ModuleList (planned)
+- Movement while in inventory (planned)
 
 ## Mods to use to replace Xenon features
 - Zoom: WI-Zoom
 - WAILA: Jade
+- FullKeyboard: [OnlyKeys](https://github.com/jaszlo/OnlyKeys)
 - ShareLocation: HereNThere
-- FullBright: any fullbright mod
-- FullKeyboard:
-- Infinite chat length:
+- FullBright: any fullbright mod of your choice
 
 ## TODO
 
 - use YACL instead of CompleteConfig
-- remove mixins
+- port OnlyKeys to 1.21.6 and PR back
 - comment out rendering from ProximityRadar
 - add FeatureList/CommandProcessor foreign mod handling
