@@ -1,4 +1,4 @@
-m# argon
+# argon
 
 Some other utilities for the block game.
 
@@ -16,7 +16,6 @@ Some other utilities for the block game.
 ## ✨New features✨
 - AutoTools (planned) (because the original AutoTool mod hasn't been updated)
 - Display external mods in ModuleList (planned)
-- Movement while in inventory (planned)
 
 ## Mods to use to replace Xenon features
 - Zoom: WI-Zoom
@@ -25,9 +24,13 @@ Some other utilities for the block game.
 - ShareLocation: HereNThere
 - FullBright: any fullbright mod of your choice
 
+## Other mods you should consider
+<sup>aka features I wanted to add, but that other people have kindly done already</sup>
+
+- [InvMove](https://github.com/PieKing1215/InvMove): Movement while in inventory
+- [FreeCam](https://modrinth.com/mod/freecam)
+
 ## TODO
 
 - use YACL instead of CompleteConfig
 - port OnlyKeys to 1.21.6 and PR back
-- comment out rendering from ProximityRadar
-- add FeatureList/CommandProcessor foreign mod handling
