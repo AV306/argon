@@ -20,22 +20,26 @@ public class Timer extends AbstractToggleableModule
 {
     // FIXME: temporary config until I get YACL in
     public float timerFactor = 2;
+    public float adjustmentInterval = 0.1f;
 
     public Timer()
     {
         super( "Timer" );
 
+        this.registerConfigSetCommands();
+
         RenderTickEvents.BEGIN_RENDER_TICK.register( this::onBeginRenderTick );
 
+        me.av306.argon.events.MouseEvents.SCROLL_END.register( this::onScroll );
         //ScrollInHotbarEvent.EVENT.register( this::onScrollInHotbar );
     }
 
-    private ActionResult onScrollInHotbar( double amount )
+    private ActionResult onScroll( long windowHandle, double horizontalScroll, double verticalScroll )
     {
         if ( this.isEnabled && Argon.getInstance().modifierKey.isPressed() && this.keyBinding.isPressed() )
         {
-            //this.timerFactor += ((int) amount) * TimerGroup.adjustmentInterval;
-            //if ( this.timerFactor < 0 ) this.timerFactor = 0; // Negative values break everything
+            this.timerFactor += ((int) verticalScroll) * this.adjustmentInterval;
+            if ( this.timerFactor < 0 ) this.timerFactor = 0; // Negative values break everything
             return ActionResult.FAIL;
         }
 
@@ -50,11 +54,12 @@ public class Timer extends AbstractToggleableModule
                         ClientCommandManager.argument( "speed", FloatArgumentType.floatArg( 0.1F ) )
                                 .executes( context ->
                                 {
-                                    this.timerFactor = FloatArgumentType.getFloat( context, "speed" );
+                                    float newFactor = FloatArgumentType.getFloat( context, "speed" );
+                                    this.sendInfoMessage( "Changed speed to %s from %s", newFactor, this.timerFactor );
+                                    this.timerFactor = newFactor;
                                     return 1;
                                 } )
                 )
-
         ) );
     }
 

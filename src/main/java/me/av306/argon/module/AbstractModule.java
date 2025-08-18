@@ -2,7 +2,6 @@ package me.av306.argon.module;
 
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -76,8 +75,10 @@ public abstract class AbstractModule
 	public void setShouldHideFromModuleList( boolean shouldHide ) { this.hide = shouldHide; }
 	public boolean shouldHideFromModuleList() { return this.hide; }
 
+	// Command nodes
 	protected LiteralCommandNode<FabricClientCommandSource> commandNode;
 	protected final LiteralArgumentBuilder<FabricClientCommandSource> commandBuilder;
+	protected LiteralArgumentBuilder<FabricClientCommandSource> configSetCommandNode;
 
 	/**
 	 * Constructor that initialises a feature with the given display name, aliases and no default key
@@ -190,22 +191,38 @@ public abstract class AbstractModule
 		);*/
 
 		// Argument builder for "set" command subtree
-		LiteralArgumentBuilder<FabricClientCommandSource> configSetterNode =
+		this.configSetCommandNode =
 				ClientCommandManager.literal( "set" );
 
 		// Let submodules override getConfigCommandArguments() to return a stream of
 		// command subtrees, one for each config; these are appended onto the "set"
 		// command node
-		this.getConfigCommandArguments().ifPresent( stream ->
+		// Overridable method calls are apparently bad, but I can't think of a nicer way
+		/*this.getConfigCommandArguments().ifPresent( stream ->
 			stream.parallel().forEach( configSetterNode::then ) );
-		this.commandBuilder.then( configSetterNode );
+		this.commandBuilder.then( configSetterNode );*/
 
 		// Register overall command tree for this module
 		ClientCommandRegistrationCallback.EVENT.register( (dispatcher, registryAccess) ->
 				this.commandNode = dispatcher.register( this.commandBuilder ) );
 	}
 
-	// The inheritance of the ArgumentBuilders is ducking weird
+	/**
+	 * Subclasses should call this in their constructors if they have config commands
+	 */
+	protected void registerConfigSetCommands()
+	{
+		this.getConfigCommandArguments().ifPresent( stream ->
+			stream.parallel().forEach( this.configSetCommandNode::then ) );
+		this.commandBuilder.then( this.configSetCommandNode );
+	}
+
+
+	/**
+	 * Subclasses should override this with command nodes to be appended to the "set" node.
+	 * <p>
+	 * NOTE: ensure that this method does
+	 */
 	protected Optional<Stream<? extends ArgumentBuilder<FabricClientCommandSource, ? extends Object>>> getConfigCommandArguments()
 	{
 		return Optional.empty();
