@@ -9,9 +9,10 @@ import org.slf4j.LoggerFactory;
 import me.av306.argon.events.MinecraftClientEvents;
 import me.av306.argon.module.AbstractModule;
 import me.av306.argon.module.AbstractToggleableModule;
-import me.av306.argon.modules.ModuleList;
-import me.av306.argon.modules.movement.Timer;
-import me.av306.argon.modules.render.ProximityRadar;
+import me.av306.argon.modules.*;
+import me.av306.argon.modules.automation.*;
+import me.av306.argon.modules.movement.*;
+import me.av306.argon.modules.render.*;
 import me.av306.argon.util.KeybindUtil;
 import me.av306.argon.util.text.TextFactory;
 import net.fabricmc.api.ClientModInitializer;
@@ -118,6 +119,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
         new ModuleList();
         new ProximityRadar();
         new Timer();
+        new BaritoneMiner();
         //new SimpleAutoTool();
     }
 
