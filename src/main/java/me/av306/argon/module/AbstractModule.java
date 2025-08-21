@@ -407,13 +407,9 @@ public abstract class AbstractModule
 
 	protected void sendInfoMessage( String key, Object... args )
 	{
-		Text message = Argon.getInstance().getNamePrefixCopy().append(
-				TextFactory.createTranslatable(
-						"text.argon.message",
-						this.name,
-						TextFactory.createTranslatable( key, args )
-				)
-		);
+		Text message = Argon.getNamePrefixCopy()
+				.append( Text.translatable( "text.argon.generic.brackets_space_end", this.name ) )
+				.append( Text.translatable( key, args ) );
 
 		try
         {
@@ -424,10 +420,9 @@ public abstract class AbstractModule
 
 	protected void sendErrorMessage( String key, Object... args )
 	{
-		Text message = Argon.getInstance().getNamePrefixCopy()
-                .append( TextFactory.createTranslatable(
-                        "text.argon.message", this.name, TextFactory.createTranslatable( key, args ) )
-                        .formatted( Argon.ERROR_FORMAT )
+		Text message = Argon.getNamePrefixCopy()
+                .append( Text.translatable( "text.argon.generic.brackets_space_end", this.name ) )
+				.append( Text.translatable( key, args ).formatted( Argon.ERROR_FORMAT ) )
                 );
 
 		try

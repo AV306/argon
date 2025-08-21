@@ -1,8 +1,10 @@
 {
-    "text.argon.toggleablemodule.enabled": "%s ENABLED",
-    "text.argon.toggleablemodule.disabled": "%s DISABLED",
+    "text.argon.abstracttoggleablemodule.enabled": "%s ENABLED",
+    "text.argon.abstracttoggleablemodule.disabled": "%s DISABLED",
     "text.argon.modulelist.version": "Argon %s",
     "text.argon.message": "[Argon] %s",
     "text.argon.proximityradar.hostile": "HOSTILE MOB (%s)",
-    "text.argon.proximityradar.plater": "PLAYER (%s)"
+    "text.argon.proximityradar.plater": "PLAYER (%s)",
+    "text.argon.generic.brackets": "(%s)",
+    "text.argon.generic.brackets_space_end": "(%s) "
 }

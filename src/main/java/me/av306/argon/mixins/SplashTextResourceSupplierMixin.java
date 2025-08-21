@@ -15,5 +15,7 @@ public class SplashTextResourceSupplierMixin
     public void onGet( CallbackInfoReturnable<SplashTextRenderer> cir )
     {
         cir.setReturnValue( new SplashTextRenderer( "ARGON-40" ) );
+
+        // TODO: fetch motd from online?2
     }
 }

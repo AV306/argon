@@ -119,7 +119,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
         new ModuleList();
         new ProximityRadar();
         new Timer();
-        new BaritoneMiner();
+        new AutoMiner();
         //new SimpleAutoTool();
     }
 

@@ -1,27 +1,18 @@
 package me.av306.argon.modules;
 
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import me.av306.argon.Argon;
-import me.av306.argon.events.HandledScreenEvents;
 import me.av306.argon.module.AbstractModule;
-import me.av306.argon.module.AbstractToggleableModule;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.SplashTextRenderer;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.resource.SplashTextResourceSupplier;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class SimpleAutoTool extends AbstractModule
 {
@@ -80,8 +71,9 @@ public class SimpleAutoTool extends AbstractModule
                 if ( sourceSlot == -1 ) sourceSlot = currentSlot;
 
                 // FIXME: ?????
+                Argon.LOGGER.info( "playerScreenHandler.syncId = {}", client.player.playerScreenHandler.syncId );
                 client.interactionManager.clickSlot(
-                        client.player.playerScreenHandler.syncId,
+                        0, //client.player.playerScreenHandler.syncId,
                         sourceSlot,
                         currentSlot,
                         SlotActionType.SWAP,
