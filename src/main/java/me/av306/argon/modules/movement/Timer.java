@@ -1,8 +1,8 @@
 package me.av306.argon.modules.movement;
 
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
+import me.av306.argon.events.MouseEvents;
 import me.av306.argon.events.RenderTickEvents;
 import me.av306.argon.module.AbstractToggleableModule;
 import me.av306.argon.Argon;
@@ -10,7 +10,6 @@ import me.av306.argon.Argon;
 //import me.av306.argon.events.ScrollInHotbarEvent;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.command.argument.ArgumentTypes;
 import net.minecraft.util.ActionResult;
 
 import java.util.Optional;
@@ -30,7 +29,7 @@ public class Timer extends AbstractToggleableModule
 
         RenderTickEvents.BEGIN_RENDER_TICK.register( this::onBeginRenderTick );
 
-        me.av306.argon.events.MouseEvents.SCROLL_END.register( this::onScroll );
+        MouseEvents.SCROLL_END.register( this::onScroll );
         //ScrollInHotbarEvent.EVENT.register( this::onScrollInHotbar );
     }
 

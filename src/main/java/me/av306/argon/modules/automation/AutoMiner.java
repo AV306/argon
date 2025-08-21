@@ -21,7 +21,7 @@ public class AutoMiner extends AbstractToggleableModule
 
     public AutoMiner()
     {
-        super( "BaritoneMiner", "autominer" );
+        super( "Auto", "autominer" );
 
         ClientTickEvents.END_CLIENT_TICK.register( this::tick );
 
@@ -31,12 +31,13 @@ public class AutoMiner extends AbstractToggleableModule
     private static boolean isWaste( ItemStack itemStack )
     {
         Item item = itemStack.getItem();
-        return (itemStack.isIn( ItemTags.STONE_TOOL_MATERIALS ) // Cobbled stuff + blackstone
+        return ( itemStack.isIn( ItemTags.STONE_TOOL_MATERIALS ) // Cobbled stuff + blackstone
                 || itemStack.isIn( ItemTags.DIRT )
                 || item == Items.DIORITE
                 || item == Items.ANDESITE
                 || item == Items.GRANITE
-                || item == Items.TUFF);
+                || item == Items.GRAVEL
+                || item == Items.TUFF );
                 //&& itemStack.getCount() > 32; // More than half a stack of it
     }
 
@@ -53,31 +54,26 @@ public class AutoMiner extends AbstractToggleableModule
             PlayerInventory inventory = client.player.getInventory();
             //var interactionManager = client.interactionManager;
 
-             // Only carries 0, 1, or 2; roughly tracks how many stacks of
-             // mining waste we have so that we can keep one
-            boolean hasSpareBlocks = false;
             for ( ItemStack itemStack : inventory )
             {
+                Argon.LOGGER.info( "checking slot {}", inventory.getSlotWithStack( itemStack ) );
                 if ( isWaste( itemStack ) )
                 {
-                    if ( hasSpareBlocks )
-                    {
-                        // Throw away
-                        // FIXME: This seems to ignore blocks in the hotbar... which may actually be useful
-                        //Argon.LOGGER.info( "discarding {}", itemStack.getName().toString() );
-                        this.sendInfoMessage( Text.literal( "Clearing inventory" ) );
-                        this.sendInfoMessage( Text.literal( "Discarding " + itemStack.getName().toString() ) );
-                        client.interactionManager.clickSlot(
-                                client.player.playerScreenHandler.syncId, // = 0
-                                inventory.getSlotWithStack( itemStack ),
-                                1,
-                                SlotActionType.THROW,
-                                client.player
-                        );
-                        //byproductsLeft--;
-                        // Don't need to update the counter past 2 stacks
-                    }
-                    else hasSpareBlocks = true;
+                    // Throw away
+                    // FIXME: This seems to ignore blocks in the hotbar... which may actually be useful
+                    //Argon.LOGGER.info( "discarding {}", itemStack.getName().toString() );
+                    this.sendInfoMessage( Text.literal( "Clearing inventory" ) );
+                    this.sendInfoMessage( Text.literal( "Discarding " + itemStack.getName().toString() ) );
+                    client.interactionManager.clickSlot(
+                            client.player.playerScreenHandler.syncId, // = 0
+                            inventory.getSlotWithStack( itemStack ),
+                            1,
+                            SlotActionType.THROW,
+                            client.player
+                    );
+                    //byproductsLeft--;
+                    // Don't need to update the counter past 2 stacks
+                    //else hasSpareBlocks = true;
                 }
             }
 

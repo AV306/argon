@@ -422,8 +422,7 @@ public abstract class AbstractModule
 	{
 		Text message = Argon.getNamePrefixCopy()
                 .append( Text.translatable( "text.argon.generic.brackets_space_end", this.name ) )
-				.append( Text.translatable( key, args ).formatted( Argon.ERROR_FORMAT ) )
-                );
+				.append( Text.translatable( key, args ).formatted( Argon.ERROR_FORMAT ) );
 
 		try
         {

@@ -18,10 +18,11 @@ public class MouseMixin
         method = "onMouseScroll(JDD)V",
         cancellable = true
     )
-    private void onOnMouseScroll( long windowHandle, double horizontal,
-            double vertical, CallbackInfo ci )
+    private void onOnMouseScroll( long windowHandle, double horizontalAmount,
+            double verticalAmount, CallbackInfo ci )
     {
-        ActionResult result = MouseEvents.SCROLL_END.invoker().onScroll( windowHandle, horizontal, vertical );
+        ActionResult result = MouseEvents.SCROLL_END.invoker()
+                .onScroll( windowHandle, horizontalAmount, verticalAmount );
 
         if ( result == ActionResult.FAIL ) ci.cancel();
     }

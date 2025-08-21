@@ -8,25 +8,21 @@ public class MouseEvents
 {
     public static final Event<ScrollEvent> SCROLL_END = EventFactory.createArrayBacked(
             ScrollEvent.class,
-            (windowHandle, horizontalScroll, verticalScroll) -> ActionResult.PASS,
-            (listeners) -> (windowHandle, horizontalScroll, verticalScroll) ->
+            (windowHandle, horizontalAmount, verticalAmount) -> ActionResult.PASS,
+            (listeners) -> (windowHandle, horizontalAmount, verticalAmount) ->
             {
-                ActionResult result = ActionResult.PASS;
                 for ( ScrollEvent listener : listeners )
                 {
-                    ActionResult intermediate =
-                            listener.onScroll( windowHandle, horizontalScroll, verticalScroll );
-                    result = intermediate;
-                    if ( intermediate != ActionResult.PASS ) break;
+                    var result = listener.onScroll( windowHandle, horizontalAmount, verticalAmount );
+                    if ( result != ActionResult.PASS ) return result;
                 }
 
-                return result;
+                return ActionResult.PASS;
             }
     );
 
     public interface ScrollEvent
     {
-        ActionResult onScroll( long windowHandle, double horizontalScroll, double verticalScroll );
+        ActionResult onScroll( long windowHandle, double horizontalAmount, double verticalAmount );
     }
-
 }

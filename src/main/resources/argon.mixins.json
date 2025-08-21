@@ -10,6 +10,7 @@
         "HandledScreenMixin",
         "MinecraftClientAccessor",
         "MinecraftClientMixin",
+        "MouseMixin",
         "SplashTextResourceSupplierMixin"
     ],
     "injectors": {
