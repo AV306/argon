@@ -6,5 +6,7 @@
     "text.argon.proximityradar.hostile": "HOSTILE MOB (%s)",
     "text.argon.proximityradar.plater": "PLAYER (%s)",
     "text.argon.generic.brackets": "(%s)",
-    "text.argon.generic.brackets_space_end": "(%s) "
+    "text.argon.generic.brackets_space_end": "(%s) ",
+    "text.argon.autominer.criticaldurability": "Current tool will break soon!",
+    "text.argon.autominer.baritone.pausing": "Pausing Baritone mining task"
 }

@@ -44,6 +44,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
 
     public static final Formatting SUCCESS_FORMAT = Formatting.GREEN;
     public static final Formatting MESSAGE_FORMAT = Formatting.AQUA;
+    public static final Formatting GENERIC_FORMAT = Formatting.GRAY;
     public static final Formatting WARNING_FORMAT = Formatting.YELLOW;
     public static final Formatting ERROR_FORMAT = Formatting.RED;
     
@@ -85,7 +86,6 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
     @Override
     public void onInitializeClient()
     {
-
         // Call the singleton's init method
         INSTANCE.initClient();
     }
