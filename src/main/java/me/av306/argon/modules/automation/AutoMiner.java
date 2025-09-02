@@ -1,7 +1,7 @@
 package me.av306.argon.modules.automation;
 
-import baritone.api.BaritoneAPI;
-import baritone.api.IBaritone;
+//import baritone.api.BaritoneAPI;
+//import baritone.api.IBaritone;
 import me.av306.argon.Argon;
 import me.av306.argon.module.AbstractToggleableModule;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -27,7 +27,6 @@ public class AutoMiner extends AbstractToggleableModule
     public AutoMiner()
     {
         super( "AutoMiner", "autominer" );
-        this.reEnableOnWorldEnter = true;
 
         ClientTickEvents.END_CLIENT_TICK.register( this::tick );
 
@@ -62,6 +61,7 @@ public class AutoMiner extends AbstractToggleableModule
         if ( !this.isEnabled ) return;
 
         // TODO: use RenderTickCounter? or generally better scheduling
+        //Argon.LOGGER.info( "dynamic dticks = {}", client.getRenderTickCounter().getDynamicDeltaTicks() );
         this.inventoryCheckCooldownCounter++;
 
         // In PlayerInventory, slots are 0-indexed starting from the leftmost hotbar slot,
@@ -85,13 +85,17 @@ public class AutoMiner extends AbstractToggleableModule
                 {
                     if ( !hasAtLeastOneStack ) hasAtLeastOneStack = true;
 
-                    else client.interactionManager.clickSlot(
-                            client.player.playerScreenHandler.syncId, // = 0
-                            inventory.getSlotWithStack( itemStack ),
-                            1,
-                            SlotActionType.THROW,
-                            client.player
-                    );
+                    else
+                    {
+                        Argon.LOGGER.info( "Discarding {}", itemStack.getItemName().getString() );
+                        client.interactionManager.clickSlot(
+                                client.player.playerScreenHandler.syncId, // = 0
+                                inventory.getSlotWithStack( itemStack ),
+                                1,
+                                SlotActionType.THROW,
+                                client.player
+                        );
+                    }
                 }
             }
 
@@ -109,11 +113,11 @@ public class AutoMiner extends AbstractToggleableModule
 
                 if ( this.hasBaritone )
                 {
-                    //client.player.networkHandler.sendChatMessage( "#pause" );
+                    client.player.networkHandler.sendChatMessage( "#pause" );
 
                     //Argon.LOGGER.info( "Baritone present" );
-                    IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
-    
+                    /*IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
+
                     if ( baritone.getMineProcess().isActive() )
                     {
                         baritone.getMineProcess().cancel();
@@ -122,7 +126,7 @@ public class AutoMiner extends AbstractToggleableModule
                             Text.translatable( "text.argon.autominer.baritone.pausing" )
                                     .formatted( Argon.WARNING_FORMAT ),
                             false );
-                    }
+                    }*/
                 }
                 // else Argon.LOGGER.info( "Baritone absent" );
             }

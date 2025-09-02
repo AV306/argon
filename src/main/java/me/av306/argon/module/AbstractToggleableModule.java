@@ -66,9 +66,9 @@ public abstract class AbstractToggleableModule extends AbstractModule
     {
         super( name, key );
 		
-		this.enabledText = TextFactory.createTranslatable( "text.argon.toggleablemodule.enabled", name )
+		this.enabledText = TextFactory.createTranslatable( "text.argon.abstracttoggleablemodule.enabled", name )
                 .formatted( Argon.SUCCESS_FORMAT );
-        this.disabledText = TextFactory.createTranslatable( "text.argon.toggleablemodule.disabled", name )
+        this.disabledText = TextFactory.createTranslatable( "text.argon.abstracttoggleablemodule.disabled", name )
                 .formatted( Argon.ERROR_FORMAT );
 
         this.commandBuilder.then( literal( "disable" ).executes( context -> { this.disable(); return 1; } ) );
@@ -84,10 +84,10 @@ public abstract class AbstractToggleableModule extends AbstractModule
     {
         super( name, key, aliases );
 
-		this.enabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.enabled", name )
+        this.enabledText = TextFactory.createTranslatable( "text.argon.abstracttoggleablemodule.enabled", name )
                 .formatted( Argon.SUCCESS_FORMAT );
-        this.disabledText = TextFactory.createTranslatable( "text.argon.itoggleablefeature.disabled", name )
-                .formatted( Argon.SUCCESS_FORMAT );
+        this.disabledText = TextFactory.createTranslatable( "text.argon.abstracttoggleablemodule.disabled", name )
+                .formatted( Argon.ERROR_FORMAT );
 
         // We're registering the things like thrice, but it works, so I'm not complaining
         // FIXME: the time has come. I must complain
