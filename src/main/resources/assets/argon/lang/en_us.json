@@ -8,5 +8,8 @@
     "text.argon.generic.brackets": "(%s)",
     "text.argon.generic.brackets_space_end": "(%s) ",
     "text.argon.autominer.criticaldurability": "Current tool will break soon!",
-    "text.argon.autominer.baritone.pausing": "Pausing Baritone mining task"
+    "text.argon.autominer.baritone.pausing": "Pausing Baritone mining task",
+    "text.argon.infohud.vehicle_velocity": "Vehicle ground/actual speed: %s / %s",
+    "text.argon.proximityradar.player": "PLAYER (%s)",
+    "text.argon.infohud.player_velocity": "Ground/actual speed: %s / %s"
 }

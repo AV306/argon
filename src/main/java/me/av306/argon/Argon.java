@@ -1,7 +1,6 @@
 package me.av306.argon;
 
 
-import me.av306.argon.modules.SimpleAutoTool;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +119,7 @@ public class Argon implements ClientModInitializer, PreLaunchEntrypoint
         new ProximityRadar();
         new Timer();
         new AutoMiner();
+        new DebugHud();
         //new SimpleAutoTool();
     }
 

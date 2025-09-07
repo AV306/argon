@@ -37,7 +37,7 @@ public class ModuleList extends AbstractToggleableModule
 
         // register render listener
         //HudRenderCallback.EVENT.register( this::onInGameHudRender );
-        HudElementRegistry.addLast( Argon.argonIdentifier( "argon_hud" ), this::onInGameHudRender );
+        HudElementRegistry.addLast( Argon.argonIdentifier( "modulelist" ), this::onInGameHudRender );
 
         // FIXME: this event may not be good
         ClientPlayConnectionEvents.JOIN.register( (handler, sender, client) ->

@@ -1,5 +1,6 @@
 package me.av306.argon.util.text;
 
+import me.av306.argon.util.render.AnchorPoint;
 import me.av306.argon.util.render.ScreenPosition;
 import me.av306.argon.Argon;
 
@@ -16,8 +17,6 @@ import java.util.Iterator;
  * <p>
  * Contains methods for drawing text at a predefined position,
  * as well as appending lines to text.
- * <p>
- * TODO: implement BOTTOM_* text drawing
  */
 public class TextUtil
 {
@@ -28,7 +27,7 @@ public class TextUtil
     /**
      * Draw a set of alignment text
      */
-    public static void drawTestText( DrawContext drawContext )
+    public static void drawScreenAlignmentText( DrawContext drawContext )
     {
         TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
         int scaledWidth = Argon.getInstance().client.getWindow().getScaledWidth();
@@ -48,7 +47,7 @@ public class TextUtil
                 scaledHeight - textRenderer.fontHeight, 0xFFFFFFFF, false );
     }
 
-    // TODO: do we want to split the position up into top/centre/bottom, left/centre/right?
+    @Deprecated
 	public static void drawPositionedText(
             DrawContext context,
             Text text,
@@ -103,6 +102,7 @@ public class TextUtil
 		}
 	}
 
+    @Deprecated
 	public static void drawPositionedText(
 			DrawContext context,
 			Text text,
@@ -126,6 +126,7 @@ public class TextUtil
 		TextUtil.drawPositionedText( context, text, position, xOffset, yOffset, shadow, color );
 	}
 
+    @Deprecated
 	public static void drawPositionedMultiLineText(
 			DrawContext context,
 			Text[] texts,
@@ -207,6 +208,7 @@ public class TextUtil
         }
 	}
 
+    @Deprecated
 	public static void drawPositionedMultiLineText(
 			DrawContext context,
 			Text[] texts,
@@ -237,6 +239,7 @@ public class TextUtil
 		);
 	}
 
+    @Deprecated
     public static void drawPositionedTexts(
         DrawContext drawContext,
         Iterator<String> texts,
@@ -307,5 +310,79 @@ public class TextUtil
                 default -> Argon.LOGGER.error( "TextUtil.drawPositionedTexts() called with position " + position.toString() + " that is not implemented yet!" );
             }
         }
+    }
+
+    public static int anchorX( int x, AnchorPoint xAnchor, int scaledWidth, int textWidth )
+    {
+        return switch ( xAnchor )
+        {
+            case LEFT -> x;
+            case CENTER -> (scaledWidth - textWidth) / 2;
+            case RIGHT -> scaledWidth - x - textWidth;
+            default -> throw new IllegalArgumentException( "Invalid X anchor: " + xAnchor.name() );
+        };
+    }
+
+    public static int anchorY( int y, AnchorPoint yAnchor, int scaledHeight, int fontHeight )
+    {
+        return switch ( yAnchor )
+        {
+            case TOP -> y;
+            case CENTER -> ((scaledHeight - fontHeight) / 2) + y;
+            case BOTTOM -> scaledHeight - y - fontHeight;
+            default -> throw new IllegalArgumentException( "Invalid Y anchor: " + yAnchor.name() );
+        };
+    }
+
+    public static void drawPositionedText(
+            DrawContext context,
+            Text text,
+            AnchorPoint xAnchor, AnchorPoint yAnchor,
+            int xOffset, int yOffset,
+            boolean shadow,
+            int color
+    )
+    {
+        TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
+
+        int scaledWidth = Argon.getInstance().client.getWindow().getScaledWidth();
+        int scaledHeight = Argon.getInstance().client.getWindow().getScaledHeight();
+
+        int x = anchorX( MARGIN + xOffset, xAnchor, scaledWidth, textRenderer.getWidth( text ) ),
+                y = anchorY( MARGIN + yOffset, yAnchor, scaledHeight, textRenderer.fontHeight );
+
+        context.drawText( textRenderer, text, x, y, color, shadow );
+    }
+
+    public static void drawPositionedText(
+            DrawContext context,
+            String text,
+            AnchorPoint xAnchor, AnchorPoint yAnchor,
+            int xOffset, int yOffset,
+            boolean shadow,
+            int color
+    )
+    {
+        TextRenderer textRenderer = Argon.getInstance().client.textRenderer;
+
+        int scaledWidth = Argon.getInstance().client.getWindow().getScaledWidth();
+        int scaledHeight = Argon.getInstance().client.getWindow().getScaledHeight();
+
+        int x = anchorX( MARGIN + xOffset, xAnchor, scaledWidth, textRenderer.getWidth( text ) ),
+                y = anchorY( MARGIN + yOffset, yAnchor, scaledHeight, textRenderer.fontHeight );
+
+        context.drawText( textRenderer, text, x, y, color, shadow );
+    }
+
+    /**
+     * Convert a number to a string with a specified number of decimal places.
+     * @param d: the number
+     * @param dps: number of decimal places
+     * @return the number, as a string with {dps} decimal places
+     */
+    public static String withDecimalPlaces( double d, int dps )
+    {
+        String s = Double.toString( d );
+        return s.substring( 0, Math.min( dps + 1, s.length() - 1 ) );
     }
 }
